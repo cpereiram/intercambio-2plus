@@ -89,6 +89,87 @@ function buildUniverse(data) {
 
 }
 
+// =====================================
+// Parser
+// =====================================
+
+const stickerTokenRegex = /^([A-Za-z0-9-]+)(?:\((\d+)\))?$/;
+
+
+/**
+ * Convierte:
+ * RSA3 -> ["RSA3"]
+ * RSA3(3) -> ["RSA3","RSA3","RSA3"]
+ */
+function expandStickerToken(token) {
+
+    const match = token.match(stickerTokenRegex);
+
+    if (!match) {
+        throw new Error(`Código inválido: ${token}`);
+    }
+
+    const code = match[1];
+    const count = parseInt(match[2] || "1", 10);
+
+    return Array(count).fill(code);
+
+}
+
+
+/**
+ * Convierte un textarea en una lista expandida.
+ */
+function parseTokenList(text) {
+
+    const result = [];
+
+    const tokens = text
+        .split(",")
+        .map(t => t.trim())
+        .filter(t => t.length);
+
+    for (const token of tokens) {
+
+        const expanded = expandStickerToken(token);
+
+        for (const sticker of expanded) {
+
+            if (!universeSet.has(sticker)) {
+                throw new Error(`La lámina ${sticker} no existe.`);
+            }
+
+            result.push(sticker);
+
+        }
+
+    }
+
+    return result;
+
+}
+
+// =====================================
+// Utilidades
+// =====================================
+
+function buildCounter(list) {
+
+    const counter = new Map();
+
+    for (const item of list) {
+
+        counter.set(
+            item,
+            (counter.get(item) || 0) + 1
+        );
+
+    }
+
+    return counter;
+
+}
+
 
 // =====================================
 // Cálculo principal
@@ -96,10 +177,23 @@ function buildUniverse(data) {
 
 function calculate() {
 
-    console.clear();
+    try {
 
-    console.log("Calculando...");
+        const faltantesA = parseTokenList(aMissing.value);
 
-    console.log(aMissing.value);
+        const repetidasA = buildCounter(
+            parseTokenList(aAvailable.value)
+        );
+
+        console.log(faltantesA);
+
+        console.log(repetidasA);
+
+    }
+    catch(error) {
+
+        alert(error.message);
+
+    }
 
 }
