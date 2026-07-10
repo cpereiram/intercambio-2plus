@@ -153,21 +153,19 @@ function parseTokenList(text) {
 // Utilidades
 // =====================================
 
+function filterUniverse(predicate) {
+    return universe.filter(predicate);
+}
+
 function buildCounter(list) {
 
     const counter = new Map();
 
     for (const item of list) {
-
-        counter.set(
-            item,
-            (counter.get(item) || 0) + 1
-        );
-
+        counter.set(item, (counter.get(item) || 0) + 1);
     }
 
     return counter;
-
 }
 
 
@@ -179,15 +177,35 @@ function calculate() {
 
     try {
 
-        const faltantesA = parseTokenList(aMissing.value);
-
-        const repetidasA = buildCounter(
-            parseTokenList(aAvailable.value)
+        const personA = createTradeState(
+            "A",
+            parseTokenList(aMissing.value),
+            buildCounter(
+                parseTokenList(aAvailable.value)
+            )
         );
 
-        console.log(faltantesA);
+        const personB = createTradeState(
+            "B",
+            parseTokenList(bMissing.value),
+            buildCounter(
+                parseTokenList(bAvailable.value)
+            )
+        );
 
-        console.log(repetidasA);
+        const plan = buildTradePlan(personA, personB);
+
+        resultADirect.textContent =
+            plan.directFromA.join(", ");
+
+        resultBDirect.textContent =
+            plan.directFromB.join(", ");
+
+        resultAMatch.textContent =
+            plan.repeatedBAgainstAUnique.join(", ");
+
+        resultBMatch.textContent =
+            plan.repeatedAAgainstBUnique.join(", ");
 
     }
     catch(error) {
@@ -195,5 +213,128 @@ function calculate() {
         alert(error.message);
 
     }
+
+}
+
+// =====================================
+// Modelo de datos
+// =====================================
+
+function createTradeState(name, missingList, availableCounter) {
+
+    const missing = new Set(missingList);
+
+    // Láminas repetidas (2 o más)
+    const repeated = new Set();
+
+    for (const [sticker, count] of availableCounter) {
+        if (count >= 2) {
+            repeated.add(sticker);
+        }
+    }
+
+    // Todo lo que ofrece (al menos una disponible)
+    const offerable = new Set(availableCounter.keys());
+
+    // Todas las que posee
+    const owned = new Set(universe);
+
+    for (const sticker of missing) {
+        owned.delete(sticker);
+    }
+
+    // Poseídas excluyendo las repetidas
+    const ownedWithoutRepeats = new Set(owned);
+
+    for (const sticker of repeated) {
+        ownedWithoutRepeats.delete(sticker);
+    }
+
+    return {
+        name,
+        missing,
+        available: availableCounter,
+        repeated,
+        offerable,
+        owned,
+        ownedWithoutRepeats
+    };
+
+}
+
+// =====================================
+// Operaciones sobre Set
+// =====================================
+
+function intersection(a, b) {
+
+    const result = new Set();
+
+    for (const value of a) {
+        if (b.has(value)) {
+            result.add(value);
+        }
+    }
+
+    return result;
+
+}
+
+function difference(a, b) {
+
+    const result = new Set();
+
+    for (const value of a) {
+        if (!b.has(value)) {
+            result.add(value);
+        }
+    }
+
+    return result;
+
+}
+
+function sortByAlbum(items) {
+
+    return [...items].sort(
+        (a, b) =>
+            universe.indexOf(a) -
+            universe.indexOf(b)
+    );
+
+}
+
+// =====================================
+// Algoritmo principal
+// =====================================
+
+function buildTradePlan(personA, personB) {
+
+    const directFromA = filterUniverse(code =>
+        personA.offerable.has(code) &&
+        personB.missing.has(code)
+    );
+
+    const directFromB = filterUniverse(code =>
+        personB.offerable.has(code) &&
+        personA.missing.has(code)
+    );
+
+    const repeatedAAgainstBUnique = filterUniverse(code =>
+        personA.repeated.has(code) &&
+        personB.ownedWithoutRepeats.has(code)
+    );
+
+    const repeatedBAgainstAUnique = filterUniverse(code =>
+        personB.repeated.has(code) &&
+        personA.ownedWithoutRepeats.has(code)
+    );
+
+    return {
+        directFromA,
+        directFromB,
+        repeatedAAgainstBUnique,
+        repeatedBAgainstAUnique
+    };
 
 }
