@@ -1,15 +1,22 @@
-// =====================================
-// Variables globales
-// =====================================
+// ======================================================
+// Intercambio de Láminas Mundial 2026
+// app.js
+// ======================================================
 
-let catalog = [];
+// ======================================================
+// Variables globales
+// ======================================================
+
+let catalog = null;
 let universe = [];
 let universeSet = new Set();
 
+const stickerTokenRegex = /^([A-Za-z0-9-]+)(?:\((\d+)\))?$/;
 
-// =====================================
+
+// ======================================================
 // Referencias HTML
-// =====================================
+// ======================================================
 
 const aMissing = document.getElementById("aMissing");
 const aAvailable = document.getElementById("aAvailable");
@@ -21,113 +28,114 @@ const calculateButton = document.getElementById("calculateButton");
 
 const resultADirect = document.getElementById("resultADirect");
 const resultBDirect = document.getElementById("resultBDirect");
-
 const resultAMatch = document.getElementById("resultAMatch");
 const resultBMatch = document.getElementById("resultBMatch");
 
+const titleADirect = document.getElementById("titleADirect");
+const titleBDirect = document.getElementById("titleBDirect");
+const titleAMatch = document.getElementById("titleAMatch");
+const titleBMatch = document.getElementById("titleBMatch");
 
-// =====================================
-// Inicialización
-// =====================================
+
+// ======================================================
+// Inicio
+// ======================================================
 
 window.addEventListener("DOMContentLoaded", initialize);
 
-
 async function initialize() {
 
-    await loadCatalog();
+    try {
 
-    calculateButton.addEventListener("click", calculate);
+        await loadCatalog();
 
-    console.log(`Catálogo cargado (${universe.length} láminas)`);
+        calculateButton.addEventListener("click", calculate);
+
+        console.log(`Catálogo cargado (${universe.length} láminas)`);
+
+    }
+    catch (error) {
+
+        alert(error.message);
+
+    }
 
 }
 
 
-// =====================================
+// ======================================================
 // Catálogo
-// =====================================
+// ======================================================
 
 async function loadCatalog() {
 
     const response = await fetch("mundial-2026.json");
 
-    const data = await response.json();
+    if (!response.ok) {
+        throw new Error("No fue posible cargar mundial-2026.json");
+    }
 
-    buildUniverse(data);
+    catalog = await response.json();
+
+    buildUniverse();
 
 }
 
-
-function buildUniverse(data) {
-
-    catalog = data;
+function buildUniverse() {
 
     universe = [];
 
-    // grupos normales
+    for (const [group, numbers] of Object.entries(catalog.groups)) {
 
-    for (const [group, numbers] of Object.entries(data.groups)) {
-
-        numbers.forEach(number => {
+        for (const number of numbers) {
 
             universe.push(`${group}${number}`);
 
-        });
+        }
 
     }
 
-    // CC
-
-    data.CC.forEach(item => {
+    for (const item of catalog.CC) {
 
         universe.push(item.name);
 
-    });
+    }
 
     universeSet = new Set(universe);
 
 }
 
-// =====================================
+
+// ======================================================
 // Parser
-// =====================================
+// ======================================================
 
-const stickerTokenRegex = /^([A-Za-z0-9-]+)(?:\((\d+)\))?$/;
-
-
-/**
- * Convierte:
- * RSA3 -> ["RSA3"]
- * RSA3(3) -> ["RSA3","RSA3","RSA3"]
- */
 function expandStickerToken(token) {
 
     const match = token.match(stickerTokenRegex);
 
     if (!match) {
+
         throw new Error(`Código inválido: ${token}`);
+
     }
 
     const code = match[1];
-    const count = parseInt(match[2] || "1", 10);
+    const count = parseInt(match[2] || "1");
 
     return Array(count).fill(code);
 
 }
 
 
-/**
- * Convierte un textarea en una lista expandida.
- */
 function parseTokenList(text) {
 
-    const result = [];
+    const stickers = [];
 
     const tokens = text
         .split(",")
         .map(t => t.trim())
-        .filter(t => t.length);
+        .filter(Boolean);
 
     for (const token of tokens) {
 
@@ -136,177 +144,125 @@ function parseTokenList(text) {
         for (const sticker of expanded) {
 
             if (!universeSet.has(sticker)) {
+
                 throw new Error(`La lámina ${sticker} no existe.`);
+
             }
 
-            result.push(sticker);
+            stickers.push(sticker);
 
         }
 
     }
 
-    return result;
+    return stickers;
 
 }
 
-// =====================================
+
+// ======================================================
 // Utilidades
-// =====================================
-
-function filterUniverse(predicate) {
-    return universe.filter(predicate);
-}
+// ======================================================
 
 function buildCounter(list) {
 
     const counter = new Map();
 
-    for (const item of list) {
-        counter.set(item, (counter.get(item) || 0) + 1);
+    for (const sticker of list) {
+
+        counter.set(
+            sticker,
+            (counter.get(sticker) || 0) + 1
+        );
+
     }
 
     return counter;
-}
-
-
-// =====================================
-// Cálculo principal
-// =====================================
-
-function calculate() {
-
-    try {
-
-        const personA = createTradeState(
-            "A",
-            parseTokenList(aMissing.value),
-            buildCounter(
-                parseTokenList(aAvailable.value)
-            )
-        );
-
-        const personB = createTradeState(
-            "B",
-            parseTokenList(bMissing.value),
-            buildCounter(
-                parseTokenList(bAvailable.value)
-            )
-        );
-
-        const plan = buildTradePlan(personA, personB);
-
-        resultADirect.textContent =
-            plan.directFromA.join(", ");
-
-        resultBDirect.textContent =
-            plan.directFromB.join(", ");
-
-        resultAMatch.textContent =
-            plan.repeatedBAgainstAUnique.join(", ");
-
-        resultBMatch.textContent =
-            plan.repeatedAAgainstBUnique.join(", ");
-
-    }
-    catch(error) {
-
-        alert(error.message);
-
-    }
 
 }
 
-// =====================================
-// Modelo de datos
-// =====================================
+
+function filterUniverse(predicate) {
+
+    return universe.filter(predicate);
+
+}
+
+
+function formatList(list) {
+
+    if (list.length === 0) {
+        return "-";
+    }
+
+    return list.join(", ");
+
+}
+
+
+// ======================================================
+// Modelo
+// ======================================================
 
 function createTradeState(name, missingList, availableCounter) {
 
     const missing = new Set(missingList);
 
-    // Láminas repetidas (2 o más)
     const repeated = new Set();
 
     for (const [sticker, count] of availableCounter) {
+
         if (count >= 2) {
+
             repeated.add(sticker);
+
         }
+
     }
 
-    // Todo lo que ofrece (al menos una disponible)
-    const offerable = new Set(availableCounter.keys());
+    const offerable = new Set(
+        availableCounter.keys()
+    );
 
-    // Todas las que posee
     const owned = new Set(universe);
 
     for (const sticker of missing) {
+
         owned.delete(sticker);
+
     }
 
-    // Poseídas excluyendo las repetidas
     const ownedWithoutRepeats = new Set(owned);
 
     for (const sticker of repeated) {
+
         ownedWithoutRepeats.delete(sticker);
+
     }
 
     return {
+
         name,
+
         missing,
+
         available: availableCounter,
+
         repeated,
+
         offerable,
+
         owned,
+
         ownedWithoutRepeats
+
     };
 
 }
 
-// =====================================
-// Operaciones sobre Set
-// =====================================
-
-function intersection(a, b) {
-
-    const result = new Set();
-
-    for (const value of a) {
-        if (b.has(value)) {
-            result.add(value);
-        }
-    }
-
-    return result;
-
-}
-
-function difference(a, b) {
-
-    const result = new Set();
-
-    for (const value of a) {
-        if (!b.has(value)) {
-            result.add(value);
-        }
-    }
-
-    return result;
-
-}
-
-function sortByAlbum(items) {
-
-    return [...items].sort(
-        (a, b) =>
-            universe.indexOf(a) -
-            universe.indexOf(b)
-    );
-
-}
-
-// =====================================
-// Algoritmo principal
-// =====================================
+// ======================================================
+// Algoritmo
+// ======================================================
 
 function buildTradePlan(personA, personB) {
 
@@ -331,10 +287,94 @@ function buildTradePlan(personA, personB) {
     );
 
     return {
+
         directFromA,
         directFromB,
+
         repeatedAAgainstBUnique,
         repeatedBAgainstAUnique
+
     };
+
+}
+
+
+// ======================================================
+// Interfaz
+// ======================================================
+
+function clearResults() {
+
+    resultADirect.textContent = "-";
+    resultBDirect.textContent = "-";
+    resultAMatch.textContent = "-";
+    resultBMatch.textContent = "-";
+
+}
+
+
+function calculate() {
+
+    try {
+
+        const personA = createTradeState(
+            "A",
+            parseTokenList(aMissing.value),
+            buildCounter(
+                parseTokenList(aAvailable.value)
+            )
+        );
+
+        const personB = createTradeState(
+            "B",
+            parseTokenList(bMissing.value),
+            buildCounter(
+                parseTokenList(bAvailable.value)
+            )
+        );
+
+        const plan = buildTradePlan(personA, personB);
+
+        console.log(plan);
+
+        titleADirect.textContent =
+            `A puede cambiarle ${plan.directFromA.length} láminas a B`;
+
+        titleBDirect.textContent =
+            `B puede cambiarle ${plan.directFromB.length} láminas a A`;
+
+        titleAMatch.textContent =
+            `A necesita ${plan.repeatedBAgainstAUnique.length} repetidas dobles de B`;
+
+        titleBMatch.textContent =
+            `B necesita ${plan.repeatedAAgainstBUnique.length} repetidas dobles de A`;
+
+        resultADirect.textContent =
+            formatList(plan.directFromA);
+
+        resultBDirect.textContent =
+            formatList(plan.directFromB);
+
+        resultAMatch.textContent =
+            formatList(plan.repeatedBAgainstAUnique);
+
+        resultBMatch.textContent =
+            formatList(plan.repeatedAAgainstBUnique);
+
+    }
+    catch (error) {
+
+        clearResults();
+
+        titleADirect.textContent = "A puede cambiarle a B";
+        titleBDirect.textContent = "B puede cambiarle a A";
+        titleAMatch.textContent = "A necesita repetidas dobles de B";
+        titleBMatch.textContent = "B necesita repetidas dobles de A";
+
+        alert(error.message);
+
+        console.error(error);
+
+    }
 
 }

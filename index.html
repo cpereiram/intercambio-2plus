@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Intercambio de Láminas Mundial 2026</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <header>
         <h1>Intercambio de Láminas Mundial 2026</h1>
-        <p>Calcula rápidamente qué láminas pueden intercambiar dos personas.</p>
+        <p>Calcula rápidamente los intercambios posibles entre dos personas.</p>
     </header>
 
     <main>
@@ -28,8 +31,8 @@
 
                 <textarea
                     id="aMissing"
-                    placeholder="Ejemplo: ARG1, BRA5, RSA12">
-                </textarea>
+                    spellcheck="false"
+                    placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
 
                 <label for="aAvailable">
                     Láminas repetidas / disponibles
@@ -37,8 +40,8 @@
 
                 <textarea
                     id="aAvailable"
-                    placeholder="Ejemplo: ARG3(2), RSA18, USA9">
-                </textarea>
+                    spellcheck="false"
+                    placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
 
             </article>
 
@@ -52,8 +55,8 @@
 
                 <textarea
                     id="bMissing"
-                    placeholder="Ejemplo: ARG1, BRA5, RSA12">
-                </textarea>
+                    spellcheck="false"
+                    placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
 
                 <label for="bAvailable">
                     Láminas repetidas / disponibles
@@ -61,8 +64,8 @@
 
                 <textarea
                     id="bAvailable"
-                    placeholder="Ejemplo: ARG3(2), RSA18, USA9">
-                </textarea>
+                    spellcheck="false"
+                    placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
 
             </article>
 
@@ -80,33 +83,41 @@
 
             <article class="resultado">
 
-                <h3>A puede cambiarle a B</h3>
+                <h3 id="titleADirect">
+                    A puede cambiarle a B
+                </h3>
 
-                <pre id="resultADirect"></pre>
-
-            </article>
-
-            <article class="resultado">
-
-                <h3>B puede cambiarle a A</h3>
-
-                <pre id="resultBDirect"></pre>
+                <pre id="resultADirect">-</pre>
 
             </article>
 
             <article class="resultado">
 
-                <h3>A necesita repetidas de B</h3>
+                <h3 id="titleBDirect">
+                    B puede cambiarle a A
+                </h3>
 
-                <pre id="resultAMatch"></pre>
+                <pre id="resultBDirect">-</pre>
 
             </article>
 
             <article class="resultado">
 
-                <h3>B necesita repetidas de A</h3>
+                <h3 id="titleAMatch">
+                    A necesita repetidas dobles de B
+                </h3>
 
-                <pre id="resultBMatch"></pre>
+                <pre id="resultAMatch">-</pre>
+
+            </article>
+
+            <article class="resultado">
+
+                <h3 id="titleBMatch">
+                    B necesita repetidas dobles de A
+                </h3>
+
+                <pre id="resultBMatch">-</pre>
 
             </article>
 
@@ -117,4 +128,5 @@
     <script src="app.js"></script>
 
 </body>
+
 </html>
