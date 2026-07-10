@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intercambio de Láminas Mundial 2026</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Intercambio de Láminas Mundial 2026</h1>
+        <p>Calcula rápidamente qué láminas pueden intercambiar dos personas.</p>
+    </header>
+
+    <main>
+
+        <section class="personas">
+
+            <article class="persona">
+
+                <h2>Persona A</h2>
+
+                <label for="aMissing">
+                    Láminas faltantes
+                </label>
+
+                <textarea
+                    id="aMissing"
+                    placeholder="Ejemplo: ARG1, BRA5, RSA12">
+                </textarea>
+
+                <label for="aAvailable">
+                    Láminas repetidas / disponibles
+                </label>
+
+                <textarea
+                    id="aAvailable"
+                    placeholder="Ejemplo: ARG3(2), RSA18, USA9">
+                </textarea>
+
+            </article>
+
+            <article class="persona">
+
+                <h2>Persona B</h2>
+
+                <label for="bMissing">
+                    Láminas faltantes
+                </label>
+
+                <textarea
+                    id="bMissing"
+                    placeholder="Ejemplo: ARG1, BRA5, RSA12">
+                </textarea>
+
+                <label for="bAvailable">
+                    Láminas repetidas / disponibles
+                </label>
+
+                <textarea
+                    id="bAvailable"
+                    placeholder="Ejemplo: ARG3(2), RSA18, USA9">
+                </textarea>
+
+            </article>
+
+        </section>
+
+        <section class="acciones">
+
+            <button id="calculateButton">
+                Calcular intercambios
+            </button>
+
+        </section>
+
+        <section class="resultados">
+
+            <article class="resultado">
+
+                <h3>A puede cambiarle a B</h3>
+
+                <pre id="resultADirect"></pre>
+
+            </article>
+
+            <article class="resultado">
+
+                <h3>B puede cambiarle a A</h3>
+
+                <pre id="resultBDirect"></pre>
+
+            </article>
+
+            <article class="resultado">
+
+                <h3>A necesita repetidas de B</h3>
+
+                <pre id="resultAMatch"></pre>
+
+            </article>
+
+            <article class="resultado">
+
+                <h3>B necesita repetidas de A</h3>
+
+                <pre id="resultBMatch"></pre>
+
+            </article>
+
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
