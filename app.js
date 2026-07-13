@@ -128,13 +128,11 @@ function expandStickerToken(token) {
     const match = token.match(stickerTokenRegex);
 
     if (!match) {
-
         throw new Error(`Código inválido: ${token}`);
-
     }
 
     const code = normalizeStickerCode(match[1]);
-    const count = parseInt(match[2] || "1");
+    const count = parseInt(match[2] || "1", 10);
 
     return Array(count).fill(code);
 
