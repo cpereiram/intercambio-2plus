@@ -112,12 +112,16 @@ function buildUniverse() {
 
 function normalizeStickerCode(code) {
 
+    console.log("Antes:", code);
+
     code = code.trim().toUpperCase();
 
-    // Aceptar "0" como "FWC0"
     if (code === "0") {
+        console.log("Convirtiendo a FWC0");
         return "FWC0";
     }
+
+    console.log("Después:", code);
 
     return code;
 
