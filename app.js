@@ -110,6 +110,19 @@ function buildUniverse() {
 // Parser
 // ======================================================
 
+function normalizeStickerCode(code) {
+
+    code = code.trim().toUpperCase();
+
+    // Aceptar "0" como "FWC0"
+    if (code === "0") {
+        return "FWC0";
+    }
+
+    return code;
+
+}
+
 function expandStickerToken(token) {
 
     const match = token.match(stickerTokenRegex);
@@ -120,7 +133,7 @@ function expandStickerToken(token) {
 
     }
 
-    const code = match[1];
+    const code = normalizeStickerCode(match[1]);
     const count = parseInt(match[2] || "1");
 
     return Array(count).fill(code);
