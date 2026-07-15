@@ -117,7 +117,6 @@ function normalizeStickerCode(code) {
     code = code.trim().toUpperCase();
 
     if (code === "0") {
-        console.log("Convirtiendo a FWC0");
         return "FWC0";
     }
 
