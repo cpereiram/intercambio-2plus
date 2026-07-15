@@ -300,13 +300,23 @@ function filterUniverse(predicate) {
 }
 
 
-function formatList(list) {
+function formatList(list, counter = null, quantityThreshold = 2) {
 
     if (list.length === 0) {
         return "-";
     }
 
-    return list.join(", ");
+    return list
+        .map(code => {
+
+            const count = counter ? counter.get(code) : 0;
+
+            return count >= quantityThreshold
+                ? `${code}(${count})`
+                : code;
+
+        })
+        .join(", ");
 
 }
 
@@ -507,16 +517,30 @@ function calculate() {
             `B necesita ${plan.repeatedAAgainstBUnique.length} repetidas dobles de A`;
 
         resultADirect.textContent =
-            formatList(plan.directFromA);
+            formatList(
+                plan.directFromA,
+                personA.available
+            );
 
         resultBDirect.textContent =
-            formatList(plan.directFromB);
+            formatList(
+                plan.directFromB,
+                personB.available
+            );
 
         resultAMatch.textContent =
-            formatList(plan.repeatedBAgainstAUnique);
+            formatList(
+                plan.repeatedBAgainstAUnique,
+                personB.available,
+                3
+            );
 
         resultBMatch.textContent =
-            formatList(plan.repeatedAAgainstBUnique);
+            formatList(
+                plan.repeatedAAgainstBUnique,
+                personA.available,
+                3
+            );
 
     }
     catch (error) {
