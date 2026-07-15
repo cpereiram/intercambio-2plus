@@ -101,9 +101,8 @@ También se puede abrir directamente el html en cualquier navegador, gracias a s
 
 El proyecto está publicado en línea mediante GitHub Pages.
 
-```
 https://cpereiram.github.io/intercambio-2plus/
-```
+
 
 ---
 
