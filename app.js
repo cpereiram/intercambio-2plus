@@ -51,16 +51,16 @@ window.addEventListener("DOMContentLoaded", initialize);
 
 async function initialize() {
 
+    calculateButton.addEventListener("click", calculate);
+    inputModes.forEach(radio =>
+        radio.addEventListener("change", updateInputMode)
+    );
+
+    updateInputMode();
+
     try {
 
         await loadCatalog();
-
-        calculateButton.addEventListener("click", calculate);
-        inputModes.forEach(radio =>
-            radio.addEventListener("change", updateInputMode)
-        );
-
-        updateInputMode();
 
         console.log(`Catálogo cargado (${universe.length} láminas)`);
 
