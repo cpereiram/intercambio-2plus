@@ -58,9 +58,30 @@ header p {
     color: var(--muted);
 }
 
+/* ---------- Modo de entrada ---------- */
+
+.mode-selector {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.mode-selector label {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.mode-selector input {
+    accent-color: var(--primary);
+}
+
 /* ---------- Personas ---------- */
 
-.personas {
+.personas,
+.figuritas-mode {
 
     display: grid;
 

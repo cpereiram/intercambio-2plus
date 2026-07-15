@@ -19,6 +19,27 @@
 
     <main>
 
+        <section class="mode-selector">
+
+            <label>
+                <input
+                    type="radio"
+                    name="inputMode"
+                    value="manual"
+                    checked>
+                Manual
+            </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="inputMode"
+                    value="figuritas">
+                Figuritas App
+            </label>
+
+        </section>
+
         <section class="personas">
 
             <article class="persona">
@@ -66,6 +87,35 @@
                     id="bAvailable"
                     spellcheck="false"
                     placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
+
+            </article>
+
+        </section>
+
+        <section
+            id="figuritasMode"
+            class="figuritas-mode"
+            hidden>
+
+            <article class="persona">
+
+                <h2>Persona A</h2>
+
+                <textarea
+                    id="aFiguritas"
+                    spellcheck="false"
+                    placeholder="Pega aquí la exportación completa de Figuritas App"></textarea>
+
+            </article>
+
+            <article class="persona">
+
+                <h2>Persona B</h2>
+
+                <textarea
+                    id="bFiguritas"
+                    spellcheck="false"
+                    placeholder="Pega aquí la exportación completa de Figuritas App"></textarea>
 
             </article>
 

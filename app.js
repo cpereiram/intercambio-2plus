@@ -24,6 +24,12 @@ const aAvailable = document.getElementById("aAvailable");
 const bMissing = document.getElementById("bMissing");
 const bAvailable = document.getElementById("bAvailable");
 
+const personasSection = document.querySelector(".personas");
+const figuritasMode = document.getElementById("figuritasMode");
+const aFiguritas = document.getElementById("aFiguritas");
+const bFiguritas = document.getElementById("bFiguritas");
+const inputModes = document.querySelectorAll("input[name=inputMode]");
+
 const calculateButton = document.getElementById("calculateButton");
 
 const resultADirect = document.getElementById("resultADirect");
@@ -50,6 +56,11 @@ async function initialize() {
         await loadCatalog();
 
         calculateButton.addEventListener("click", calculate);
+        inputModes.forEach(radio =>
+            radio.addEventListener("change", updateInputMode)
+        );
+
+        updateInputMode();
 
         console.log(`Catálogo cargado (${universe.length} láminas)`);
 
@@ -170,6 +181,92 @@ function parseTokenList(text) {
     }
 
     return stickers;
+
+}
+
+function parseFiguritasExport(text) {
+
+    const sections = {
+        missing: [],
+        available: []
+    };
+
+    let currentSection = null;
+
+    for (const rawLine of text.split(/\r?\n/)) {
+
+        const line = rawLine.trim();
+
+        if (!line) {
+            continue;
+        }
+
+        if (/^Me faltan$/i.test(line)) {
+            currentSection = "missing";
+            continue;
+        }
+
+        if (/^Repetidas$/i.test(line)) {
+            currentSection = "available";
+            continue;
+        }
+
+        if (!currentSection) {
+            continue;
+        }
+
+        const match = line.match(/^([A-Za-z]{2,3})\b[^:]*:\s*(.+)$/);
+
+        if (!match) {
+            continue;
+        }
+
+        const group = match[1].toUpperCase();
+        const tokens = match[2]
+            .split(",")
+            .map(token => token.trim())
+            .filter(Boolean);
+
+        for (const token of tokens) {
+
+            const numberMatch = token.match(/^(\d+)(?:\((\d+)\))?$/);
+
+            if (!numberMatch) {
+                throw new Error(
+                    `Formato invÃ¡lido en Figuritas App: ${line}`
+                );
+            }
+
+            const code = group === "CC"
+                ? `CC${numberMatch[1]}-LAM`
+                : `${group}${numberMatch[1]}`;
+
+            const count = numberMatch[2];
+
+            sections[currentSection].push(
+                count ? `${code}(${count})` : code
+            );
+
+        }
+
+    }
+
+    if (sections.missing.length === 0) {
+        throw new Error(
+            "No se encontraron lÃ¡minas en la secciÃ³n 'Me faltan'."
+        );
+    }
+
+    if (sections.available.length === 0) {
+        throw new Error(
+            "No se encontraron lÃ¡minas en la secciÃ³n 'Repetidas'."
+        );
+    }
+
+    return {
+        missingText: sections.missing.join(","),
+        availableText: sections.available.join(",")
+    };
 
 }
 
@@ -317,6 +414,23 @@ function buildTradePlan(personA, personB) {
 // Interfaz
 // ======================================================
 
+function getInputMode() {
+
+    return document.querySelector(
+        "input[name=inputMode]:checked"
+    ).value;
+
+}
+
+function updateInputMode() {
+
+    const figuritas = getInputMode() === "figuritas";
+
+    personasSection.hidden = figuritas;
+    figuritasMode.hidden = !figuritas;
+
+}
+
 function clearResults() {
 
     resultADirect.textContent = "-";
@@ -331,21 +445,50 @@ function calculate() {
 
     try {
 
-        const personA = createTradeState(
-            "A",
-            parseTokenList(aMissing.value),
-            buildCounter(
-                parseTokenList(aAvailable.value)
-            )
-        );
+        let personA;
+        let personB;
 
-        const personB = createTradeState(
-            "B",
-            parseTokenList(bMissing.value),
-            buildCounter(
-                parseTokenList(bAvailable.value)
-            )
-        );
+        if (getInputMode() === "manual") {
+
+            personA = createTradeState(
+                "A",
+                parseTokenList(aMissing.value),
+                buildCounter(
+                    parseTokenList(aAvailable.value)
+                )
+            );
+
+            personB = createTradeState(
+                "B",
+                parseTokenList(bMissing.value),
+                buildCounter(
+                    parseTokenList(bAvailable.value)
+                )
+            );
+
+        }
+        else {
+
+            const dataA = parseFiguritasExport(aFiguritas.value);
+            const dataB = parseFiguritasExport(bFiguritas.value);
+
+            personA = createTradeState(
+                "A",
+                parseTokenList(dataA.missingText),
+                buildCounter(
+                    parseTokenList(dataA.availableText)
+                )
+            );
+
+            personB = createTradeState(
+                "B",
+                parseTokenList(dataB.missingText),
+                buildCounter(
+                    parseTokenList(dataB.availableText)
+                )
+            );
+
+        }
 
         const plan = buildTradePlan(personA, personB);
 
