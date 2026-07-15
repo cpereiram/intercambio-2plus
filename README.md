@@ -112,7 +112,6 @@ https://cpereiram.github.io/intercambio-2plus/
 * Cálculo automático mientras se escribe.
 * Importación y exportación de listas.
 * Admitir multiples formatos de listas.
-* Aceptar 0 y FWC0 como iguales.
 * Copiar resultados al portapapeles.
 * Estadísticas del álbum.
 * Comparación entre más de dos personas.
