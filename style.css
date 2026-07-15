@@ -93,6 +93,11 @@ header p {
 
 }
 
+.personas[hidden],
+.figuritas-mode[hidden] {
+    display: none;
+}
+
 .persona {
 
     background: var(--card);
