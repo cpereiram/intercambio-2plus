@@ -256,6 +256,23 @@ pre {
 
 }
 
+.copy-result {
+    width: 100%;
+    margin-top: .8rem;
+    padding: .7rem 1rem;
+    background: var(--card-hover);
+}
+
+.copy-result:hover:not(:disabled) {
+    background: var(--border);
+    transform: none;
+}
+
+.copy-result:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 900px) {
