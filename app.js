@@ -41,6 +41,7 @@ const titleADirect = document.getElementById("titleADirect");
 const titleBDirect = document.getElementById("titleBDirect");
 const titleAMatch = document.getElementById("titleAMatch");
 const titleBMatch = document.getElementById("titleBMatch");
+const copyButtons = document.querySelectorAll(".copy-result");
 
 
 // ======================================================
@@ -54,6 +55,9 @@ async function initialize() {
     calculateButton.addEventListener("click", calculate);
     inputModes.forEach(radio =>
         radio.addEventListener("change", updateInputMode)
+    );
+    copyButtons.forEach(button =>
+        button.addEventListener("click", () => copyResult(button))
     );
 
     updateInputMode();
@@ -438,6 +442,82 @@ function clearResults() {
     resultAMatch.textContent = "-";
     resultBMatch.textContent = "-";
 
+    updateCopyButtons();
+
+}
+
+function updateCopyButtons() {
+
+    copyButtons.forEach(button => {
+
+        const result = document.getElementById(
+            button.dataset.resultId
+        );
+
+        button.disabled = result.textContent.trim() === "-";
+        button.textContent = "Copiar resultado";
+
+    });
+
+}
+
+async function copyResult(button) {
+
+    const result = document.getElementById(
+        button.dataset.resultId
+    );
+
+    const text = result.textContent.trim();
+
+    if (!text || text === "-") {
+        return;
+    }
+
+    try {
+
+        await copyText(text);
+
+        button.textContent = "Â¡Copiado!";
+
+        window.setTimeout(() => {
+            button.textContent = "Copiar resultado";
+        }, 2000);
+
+    }
+    catch (error) {
+
+        alert("No fue posible copiar el resultado.");
+        console.error(error);
+
+    }
+
+}
+
+async function copyText(text) {
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+    }
+
+    const temporaryInput = document.createElement("textarea");
+
+    temporaryInput.value = text;
+    temporaryInput.setAttribute("readonly", "");
+    temporaryInput.style.position = "fixed";
+    temporaryInput.style.opacity = "0";
+
+    document.body.appendChild(temporaryInput);
+    temporaryInput.select();
+
+    const copied = document.execCommand("copy");
+
+    temporaryInput.remove();
+
+    if (!copied) {
+        throw new Error("Clipboard API no disponible.");
+    }
+
 }
 
 
@@ -517,6 +597,8 @@ function calculate() {
 
         resultBMatch.textContent =
             formatList(plan.repeatedAAgainstBUnique);
+
+        updateCopyButtons();
 
     }
     catch (error) {
