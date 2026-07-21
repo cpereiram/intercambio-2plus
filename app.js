@@ -26,11 +26,15 @@ const bAvailable = document.getElementById("bAvailable");
 
 const personasSection = document.querySelector(".personas");
 const figuritasMode = document.getElementById("figuritasMode");
+const intercambialaminasMode = document.getElementById("intercambialaminasMode");
 const aFiguritas = document.getElementById("aFiguritas");
 const bFiguritas = document.getElementById("bFiguritas");
+const aIntercambialaminasId = document.getElementById("aIntercambialaminasId");
+const bIntercambialaminasId = document.getElementById("bIntercambialaminasId");
 const inputModes = document.querySelectorAll("input[name=inputMode]");
 
 const calculateButton = document.getElementById("calculateButton");
+const calculationStatus = document.getElementById("calculationStatus");
 
 const resultADirect = document.getElementById("resultADirect");
 const resultBDirect = document.getElementById("resultBDirect");
@@ -41,6 +45,9 @@ const titleADirect = document.getElementById("titleADirect");
 const titleBDirect = document.getElementById("titleBDirect");
 const titleAMatch = document.getElementById("titleAMatch");
 const titleBMatch = document.getElementById("titleBMatch");
+
+const INTERCAMBIALAMINAS_API = "https://api.intercambialaminas.com";
+const WORLD_CUP_2026_COLLECTION_ID = 2633;
 
 
 // ======================================================
@@ -270,6 +277,147 @@ function parseFiguritasExport(text) {
 
 }
 
+// ======================================================
+// Intercambialaminas.com
+// ======================================================
+
+function parseIntercambialaminasUserId(value) {
+
+    const match = value.trim().match(/(?:\/user\/)?(\d+)(?:\/?(?:\?.*)?)?$/i);
+
+    if (!match) {
+        throw new Error("Ingresa un ID de usuario válido o el enlace de su perfil.");
+    }
+
+    return match[1];
+
+}
+
+async function fetchIntercambialaminasJson(path) {
+
+    let response;
+
+    try {
+        response = await fetch(`${INTERCAMBIALAMINAS_API}${path}`, {
+            headers: { Accept: "application/json" }
+        });
+    }
+    catch (error) {
+        throw new Error(
+            "No fue posible conectar con Intercambialaminas.com. " +
+            "Revisa tu conexión e inténtalo nuevamente."
+        );
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            `Intercambialaminas.com no pudo obtener los datos (HTTP ${response.status}).`
+        );
+    }
+
+    return response.json();
+
+}
+
+function getExternalItemCount(item) {
+
+    const count = Number(item?.quantity ?? item?.count ?? item?.amount ?? 1);
+
+    return Number.isInteger(count) && count > 0 ? count : 1;
+
+}
+
+function findStickerCodeInExternalItem(item) {
+
+    if (typeof item === "string") {
+        const normalized = normalizeStickerCode(item);
+        return universeSet.has(normalized) ? normalized : null;
+    }
+
+    if (!item || typeof item !== "object") {
+        return null;
+    }
+
+    const directCode = item.code ?? item.stickerCode ?? item.itemCode;
+
+    if (directCode) {
+        const normalized = normalizeStickerCode(String(directCode));
+
+        if (universeSet.has(normalized)) {
+            return normalized;
+        }
+    }
+
+    const group = item.group ?? item.prefix ?? item.countryCode;
+    const number = item.number ?? item.itemNumber;
+
+    if (group !== undefined && number !== undefined) {
+        const normalized = normalizeStickerCode(`${group}${number}`);
+
+        if (universeSet.has(normalized)) {
+            return normalized;
+        }
+    }
+
+    for (const value of Object.values(item)) {
+        if (typeof value === "string") {
+            const normalized = normalizeStickerCode(value);
+
+            if (universeSet.has(normalized)) {
+                return normalized;
+            }
+        }
+    }
+
+    return null;
+
+}
+
+function externalListToStickers(items) {
+
+    if (!Array.isArray(items)) {
+        return [];
+    }
+
+    const stickers = [];
+
+    for (const item of items) {
+        const code = findStickerCodeInExternalItem(item);
+
+        if (code) {
+            stickers.push(...Array(getExternalItemCount(item)).fill(code));
+        }
+    }
+
+    return stickers;
+
+}
+
+async function loadIntercambialaminasTradeState(value, letter) {
+
+    const userId = parseIntercambialaminasUserId(value);
+    const result = await fetchIntercambialaminasJson(
+        `/v2/users/${userId}/collections/${WORLD_CUP_2026_COLLECTION_ID}?include=publisher`
+    );
+    const data = result.data;
+
+    if (!data?.info) {
+        throw new Error(`No se encontró el álbum Mundial 2026 para el usuario ${userId}.`);
+    }
+
+    const missing = externalListToStickers(data.wishlist);
+    const available = externalListToStickers(data.tradelist);
+
+    if (missing.length === 0 && available.length === 0) {
+        throw new Error(
+            `No se pudieron leer listas públicas de intercambio para el usuario ${userId}.`
+        );
+    }
+
+    return createTradeState(letter, missing, buildCounter(available));
+
+}
+
 
 // ======================================================
 // Utilidades
@@ -424,10 +572,13 @@ function getInputMode() {
 
 function updateInputMode() {
 
-    const figuritas = getInputMode() === "figuritas";
+    const mode = getInputMode();
+    const figuritas = mode === "figuritas";
+    const intercambialaminas = mode === "intercambialaminas";
 
-    personasSection.hidden = figuritas;
+    personasSection.hidden = mode !== "manual";
     figuritasMode.hidden = !figuritas;
+    intercambialaminasMode.hidden = !intercambialaminas;
 
 }
 
@@ -440,15 +591,29 @@ function clearResults() {
 
 }
 
+function setCalculationLoading(isLoading) {
 
-function calculate() {
+    calculateButton.disabled = isLoading;
+    calculateButton.textContent = isLoading
+        ? "Consultando colecciones..."
+        : "Calcular intercambios";
+    calculationStatus.textContent = isLoading
+        ? "Obteniendo las listas públicas de ambos usuarios."
+        : "";
+
+}
+
+
+async function calculate() {
 
     try {
 
         let personA;
         let personB;
 
-        if (getInputMode() === "manual") {
+        const mode = getInputMode();
+
+        if (mode === "manual") {
 
             personA = createTradeState(
                 "A",
@@ -467,7 +632,7 @@ function calculate() {
             );
 
         }
-        else {
+        else if (mode === "figuritas") {
 
             const dataA = parseFiguritasExport(aFiguritas.value);
             const dataB = parseFiguritasExport(bFiguritas.value);
@@ -487,6 +652,16 @@ function calculate() {
                     parseTokenList(dataB.availableText)
                 )
             );
+
+        }
+        else {
+
+            setCalculationLoading(true);
+
+            [personA, personB] = await Promise.all([
+                loadIntercambialaminasTradeState(aIntercambialaminasId.value, "A"),
+                loadIntercambialaminasTradeState(bIntercambialaminasId.value, "B")
+            ]);
 
         }
 
@@ -518,6 +693,11 @@ function calculate() {
         resultBMatch.textContent =
             formatList(plan.repeatedAAgainstBUnique);
 
+        calculationStatus.textContent =
+            mode === "intercambialaminas"
+                ? "Listas actualizadas desde Intercambialaminas.com."
+                : "";
+
     }
     catch (error) {
 
@@ -531,6 +711,11 @@ function calculate() {
         alert(error.message);
 
         console.error(error);
+
+    }
+    finally {
+
+        setCalculationLoading(false);
 
     }
 

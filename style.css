@@ -81,7 +81,8 @@ header p {
 /* ---------- Personas ---------- */
 
 .personas,
-.figuritas-mode {
+.figuritas-mode,
+.intercambialaminas-mode {
 
     display: grid;
 
@@ -94,7 +95,8 @@ header p {
 }
 
 .personas[hidden],
-.figuritas-mode[hidden] {
+.figuritas-mode[hidden],
+.intercambialaminas-mode[hidden] {
     display: none;
 }
 
@@ -154,6 +156,40 @@ textarea {
 
 }
 
+input[type="text"] {
+
+    width: 100%;
+
+    background: var(--input);
+
+    color: var(--text);
+
+    border: 1px solid var(--border);
+
+    border-radius: 8px;
+
+    padding: .8rem;
+
+    font-size: .95rem;
+
+}
+
+input[type="text"]:focus {
+
+    outline: none;
+
+    border-color: var(--primary);
+
+}
+
+.mode-help {
+
+    grid-column: 1 / -1;
+
+    color: var(--muted);
+
+}
+
 textarea:focus {
 
     outline: none;
@@ -171,6 +207,20 @@ textarea:focus {
     justify-content: center;
 
     margin: 2rem 0;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: .75rem;
+
+}
+
+.calculation-status {
+
+    min-height: 1.2rem;
+
+    color: var(--muted);
 
 }
 
@@ -260,7 +310,9 @@ pre {
 
 @media (max-width: 900px) {
 
-    .personas {
+    .personas,
+    .figuritas-mode,
+    .intercambialaminas-mode {
 
         grid-template-columns: 1fr;
 

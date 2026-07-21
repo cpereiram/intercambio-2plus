@@ -27,7 +27,7 @@
                     name="inputMode"
                     value="manual"
                     checked>
-                Intercambialaminas
+                Ingreso manual
             </label>
 
             <label>
@@ -37,6 +37,57 @@
                     value="figuritas">
                 Figuritas App
             </label>
+
+            <label>
+                <input
+                    type="radio"
+                    name="inputMode"
+                    value="intercambialaminas">
+                Intercambialaminas.com
+            </label>
+
+        </section>
+
+        <section
+            id="intercambialaminasMode"
+            class="intercambialaminas-mode"
+            hidden>
+
+            <article class="persona">
+
+                <h2>Persona A · Intercambialaminas.com</h2>
+
+                <label for="aIntercambialaminasId">
+                    ID de usuario o enlace de perfil
+                </label>
+
+                <input
+                    id="aIntercambialaminasId"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="Ejemplo: 14170 o https://intercambialaminas.com/user/14170">
+
+            </article>
+
+            <article class="persona">
+
+                <h2>Persona B · Intercambialaminas.com</h2>
+
+                <label for="bIntercambialaminasId">
+                    ID de usuario o enlace de perfil
+                </label>
+
+                <input
+                    id="bIntercambialaminasId"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="Ejemplo: 14170 o https://intercambialaminas.com/user/14170">
+
+            </article>
+
+            <p class="mode-help">
+                Se consultarán las listas públicas del álbum FIFA World Cup 2026 Panini.
+            </p>
 
         </section>
 
@@ -134,6 +185,8 @@
             <button id="calculateButton">
                 Calcular intercambios
             </button>
+
+            <p id="calculationStatus" class="calculation-status" aria-live="polite"></p>
 
         </section>
 
