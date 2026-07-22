@@ -21,113 +21,158 @@
 
         <section class="mode-selector">
 
-            <label>
-                <input
-                    type="radio"
-                    name="inputMode"
-                    value="manual"
-                    checked>
-                Intercambialaminas
-            </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="inputMode"
+                            value="manual"
+                            checked>
+                        Intercambialaminas (Manual)
+                    </label>
 
-            <label>
-                <input
-                    type="radio"
-                    name="inputMode"
-                    value="figuritas">
-                Figuritas App
-            </label>
+                    <label>
+                        <input
+                            type="radio"
+                            name="inputMode"
+                            value="figuritas">
+                        Figuritas App
+                    </label>
 
-        </section>
+                    <label>
+                        <input
+                            type="radio"
+                            name="inputMode"
+                            value="intercambialaminas">
+                        Intercambialaminas (ID)
+                    </label>
 
-        <section class="personas">
+                </section>
 
-            <article class="persona">
+                <section class="personas">
 
-                <h2>Persona A · Manual</h2>
+                    <article class="persona">
 
-                <label for="aMissing">
-                    Láminas faltantes
-                </label>
+                        <h2>Persona A · Intercambialaminas (Manual)</h2>
 
-                <textarea
-                    id="aMissing"
-                    spellcheck="false"
-                    placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
+                        <label for="aMissing">
+                            Láminas faltantes
+                        </label>
 
-                <label for="aAvailable">
-                    Láminas repetidas / disponibles
-                </label>
+                        <textarea
+                            id="aMissing"
+                            spellcheck="false"
+                            placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
 
-                <textarea
-                    id="aAvailable"
-                    spellcheck="false"
-                    placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
+                        <label for="aAvailable">
+                            Láminas repetidas / disponibles
+                        </label>
 
-            </article>
+                        <textarea
+                            id="aAvailable"
+                            spellcheck="false"
+                            placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
 
-            <article class="persona">
+                    </article>
 
-                <h2>Persona B · Manual</h2>
+                    <article class="persona">
 
-                <label for="bMissing">
-                    Láminas faltantes
-                </label>
+                        <h2>Persona B · Intercambialaminas (Manual)</h2>
 
-                <textarea
-                    id="bMissing"
-                    spellcheck="false"
-                    placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
+                        <label for="bMissing">
+                            Láminas faltantes
+                        </label>
 
-                <label for="bAvailable">
-                    Láminas repetidas / disponibles
-                </label>
+                        <textarea
+                            id="bMissing"
+                            spellcheck="false"
+                            placeholder="Ejemplo: ARG1, BRA5, RSA12"></textarea>
 
-                <textarea
-                    id="bAvailable"
-                    spellcheck="false"
-                    placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
+                        <label for="bAvailable">
+                            Láminas repetidas / disponibles
+                        </label>
 
-            </article>
+                        <textarea
+                            id="bAvailable"
+                            spellcheck="false"
+                            placeholder="Ejemplo: ARG3(2), RSA18, USA9"></textarea>
 
-        </section>
+                    </article>
 
-        <section
-            id="figuritasMode"
-            class="figuritas-mode"
-            hidden>
+                </section>
 
-            <article class="persona">
+                <section
+                    id="figuritasMode"
+                    class="figuritas-mode"
+                    hidden>
 
-                <h2>Persona A · Figuritas App</h2>
+                    <article class="persona">
 
-                <label for="aFiguritas">
-                    Exportación completa
-                </label>
+                        <h2>Persona A · Figuritas App</h2>
 
-                <textarea
-                    id="aFiguritas"
-                    spellcheck="false"
-                    placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
+                        <label for="aFiguritas">
+                            Exportación completa
+                        </label>
 
-            </article>
+                        <textarea
+                            id="aFiguritas"
+                            spellcheck="false"
+                            placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
 
-            <article class="persona">
+                    </article>
 
-                <h2>Persona B · Figuritas App</h2>
+                    <article class="persona">
 
-                <label for="bFiguritas">
-                    Exportación completa
-                </label>
+                        <h2>Persona B · Figuritas App</h2>
 
-                <textarea
-                    id="bFiguritas"
-                    spellcheck="false"
-                    placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
+                        <label for="bFiguritas">
+                            Exportación completa
+                        </label>
 
-            </article>
+                        <textarea
+                            id="bFiguritas"
+                            spellcheck="false"
+                            placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
 
-        </section>
+                    </article>
+
+                </section>
+
+                <section
+                    id="intercambialaminasMode"
+                    class="intercambialaminas-mode"
+                    hidden>
+
+                    <article class="persona">
+
+                        <h2>Persona A · Intercambialaminas (ID)</h2>
+
+                        <label for="aIntercambialaminasId">
+                            ID o enlace del perfil
+                        </label>
+
+                        <input
+                            id="aIntercambialaminasId"
+                            type="text"
+                            placeholder="14170 o https://intercambialaminas.com/user/14170">
+
+                    </article>
+
+                    <article class="persona">
+
+                        <h2>Persona B · Intercambialaminas (ID)</h2>
+
+                        <label for="bIntercambialaminasId">
+                            ID o enlace del perfil
+                        </label>
+
+                        <input
+                            id="bIntercambialaminasId"
+                            type="text"
+                            placeholder="14170 o https://intercambialaminas.com/user/14170">
+
+                    </article>
+
+                </section>
 
         <section class="acciones">
 
