@@ -26,6 +26,11 @@ const bAvailable = document.getElementById("bAvailable");
 
 const personasSection = document.querySelector(".personas");
 const figuritasMode = document.getElementById("figuritasMode");
+const intercambialaminasMode = document.getElementById("intercambialaminasMode");
+
+const aIntercambialaminasId = document.getElementById("aIntercambialaminasId");
+const bIntercambialaminasId = document.getElementById("bIntercambialaminasId");
+
 const aFiguritas = document.getElementById("aFiguritas");
 const bFiguritas = document.getElementById("bFiguritas");
 const inputModes = document.querySelectorAll("input[name=inputMode]");
@@ -42,6 +47,11 @@ const titleBDirect = document.getElementById("titleBDirect");
 const titleAMatch = document.getElementById("titleAMatch");
 const titleBMatch = document.getElementById("titleBMatch");
 const copyButtons = document.querySelectorAll(".copy-result");
+
+const calculationStatus = document.getElementById("calculationStatus");
+
+const INTERCAMBIALAMINAS_API = "https://api.intercambialaminas.com";
+const WORLD_CUP_2026_COLLECTION_ID = 2633;
 
 
 // ======================================================
@@ -237,7 +247,7 @@ function parseFiguritasExport(text) {
 
             if (!numberMatch) {
                 throw new Error(
-                    `Formato invÃ¡lido en Figuritas App: ${line}`
+                    `Formato inválido en Figuritas App: ${line}`
                 );
             }
 
@@ -257,13 +267,13 @@ function parseFiguritasExport(text) {
 
     if (sections.missing.length === 0) {
         throw new Error(
-            "No se encontraron lÃ¡minas en la secciÃ³n 'Me faltan'."
+            "No se encontraron láminas en la sección 'Me faltan'."
         );
     }
 
     if (sections.available.length === 0) {
         throw new Error(
-            "No se encontraron lÃ¡minas en la secciÃ³n 'Repetidas'."
+            "No se encontraron láminas en la sección 'Repetidas'."
         );
     }
 
