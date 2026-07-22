@@ -93,8 +93,6 @@ http://localhost:8000
 
 También puede utilizarse la extensión **Live Server** de Visual Studio Code.
 
-También se puede abrir directamente el html en cualquier navegador, gracias a su ejecución no requiere nada externo.
-
 ---
 
 ## Publicación
@@ -111,19 +109,15 @@ https://cpereiram.github.io/intercambio-2plus/
 * Guardado automático mediante LocalStorage.
 * Cálculo automático mientras se escribe.
 * Importación y exportación de listas.
-* Admitir multiples formatos de listas.
-* Copiar resultados al portapapeles.
 * Estadísticas del álbum.
 * Comparación entre más de dos personas.
 * Soporte para nuevos álbumes mediante JSON.
-* Permitir ingresar ID de perfil de intercambialáminas.com.
-* Mostrar la cantidad, tanto en el resultado de cambios directos, como de repetidas dobles.
 
 ---
 
 ## Origen del proyecto
 
-Este proyecto nace de la necesidad de poder calcular de manera rapida los intercambios de repetidas entre dos personas, comenzando primero como  una aplicación de escritorio desarrollada  en Python (Tkinter),  migrando posteriormente toda la lógica a una aplicación web estática para facilitar su uso desde cualquier dispositivo.
+Este proyecto nace de la necesidad de poder calcular de manera rápida los intercambios de repetidas entre dos personas, comenzando primero como  una aplicación de escritorio desarrollada  en Python (Tkinter),  migrando posteriormente toda la lógica a una aplicación web estática para facilitar su uso desde cualquier dispositivo.
 
 El algoritmo de intercambio fue preservado durante la migración, adaptando únicamente la interfaz y la implementación al ecosistema JavaScript.
 
