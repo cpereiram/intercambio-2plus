@@ -81,7 +81,7 @@ header p {
 /* ---------- Personas ---------- */
 
 .personas,
-.figuritas-mode
+.figuritas-mode,
 .intercambialaminas-mode {
 
     display: grid;
@@ -95,19 +95,9 @@ header p {
 }
 
 .personas[hidden],
-.figuritas-mode[hidden]
-.intercambialaminas-mode[hidden]{
+.figuritas-mode[hidden],
+.intercambialaminas-mode[hidden] {
     display: none;
-}
-
-.intercambialaminas-mode input{
-    width:100%;
-    background:var(--input);
-    color:var(--text);
-    border:1px solid var(--border);
-    border-radius:8px;
-    padding:.8rem;
-    font-size:.95rem;
 }
 
 .persona {
@@ -126,6 +116,16 @@ header p {
 
     margin-bottom: 1rem;
 
+}
+
+.intercambialaminas-mode input{
+    width:100%;
+    background:var(--input);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:.8rem;
+    font-size:.95rem;
 }
 
 label {
@@ -314,7 +314,9 @@ pre {
     }
 
     .persona,
-    .resultado {
+    .resultado,
+    .figuritas-mode,
+    .intercambialaminas-mode {
 
         padding: 1rem;
 
@@ -333,3 +335,4 @@ pre {
     }
 
 }
+
