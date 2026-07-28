@@ -4,13 +4,26 @@
 // ======================================================
 
 // ======================================================
+// Importaciones de modelos
+// ======================================================
+
+import Album from "./model/album.js";
+import AlbumState from "./model/albumState.js";
+import TradePlanner from "./model/tradePlanner.js";
+
+// ======================================================
+// Versión
+// ======================================================
+import { VERSION } from "./version.js";
+
+document.getElementById("version").textContent =
+    `v${VERSION}`;
+
+// ======================================================
 // Variables globales
 // ======================================================
 
-let catalog = null;
-let universe = [];
-let universeSet = new Set();
-
+let album = null;
 const stickerTokenRegex = /^([A-Za-z0-9-]+)(?:\((\d+)\))?$/;
 
 
@@ -76,7 +89,7 @@ async function initialize() {
 
         await loadCatalog();
 
-        console.log(`Catálogo cargado (${universe.length} láminas)`);
+        console.log(`Catálogo cargado (${album.size} láminas)`);
 
     }
     catch (error) {
@@ -100,33 +113,9 @@ async function loadCatalog() {
         throw new Error("No fue posible cargar mundial-2026.json");
     }
 
-    catalog = await response.json();
+    const catalog = await response.json();
 
-    buildUniverse();
-
-}
-
-function buildUniverse() {
-
-    universe = [];
-
-    for (const [group, numbers] of Object.entries(catalog.groups)) {
-
-        for (const number of numbers) {
-
-            universe.push(`${group}${number}`);
-
-        }
-
-    }
-
-    for (const item of catalog.CC) {
-
-        universe.push(item.name);
-
-    }
-
-    universeSet = new Set(universe);
+    album = new Album(catalog);
 
 }
 
@@ -137,15 +126,11 @@ function buildUniverse() {
 
 function normalizeStickerCode(code) {
 
-    console.log("Antes:", code);
-
     code = code.trim().toUpperCase();
 
     if (code === "0") {
         return "FWC0";
     }
-
-    console.log("Después:", code);
 
     return code;
 
@@ -182,7 +167,7 @@ function parseTokenList(text) {
 
         for (const sticker of expanded) {
 
-            if (!universeSet.has(sticker)) {
+            if (!album.has(sticker)) {
 
                 throw new Error(`La lámina ${sticker} no existe.`);
 
@@ -338,7 +323,7 @@ function findStickerCodeInExternalItem(item) {
 
     if (typeof item === "string") {
         const normalized = normalizeStickerCode(item);
-        return universeSet.has(normalized) ? normalized : null;
+        return album.has(normalized) ? normalized : null;
     }
 
     if (!item || typeof item !== "object") {
@@ -350,7 +335,7 @@ function findStickerCodeInExternalItem(item) {
     if (directCode) {
         const normalized = normalizeStickerCode(String(directCode));
 
-        if (universeSet.has(normalized)) {
+        if (album.has(normalized)) {
             return normalized;
         }
     }
@@ -361,7 +346,7 @@ function findStickerCodeInExternalItem(item) {
     if (group !== undefined && number !== undefined) {
         const normalized = normalizeStickerCode(`${group}${number}`);
 
-        if (universeSet.has(normalized)) {
+        if (album.has(normalized)) {
             return normalized;
         }
     }
@@ -370,7 +355,7 @@ function findStickerCodeInExternalItem(item) {
         if (typeof value === "string") {
             const normalized = normalizeStickerCode(value);
 
-            if (universeSet.has(normalized)) {
+            if (album.has(normalized)) {
                 return normalized;
             }
         }
@@ -421,7 +406,11 @@ async function loadIntercambialaminasTradeState(value, letter) {
         );
     }
 
-    return createTradeState(letter, missing, buildCounter(available));
+    return createAlbumState(
+        letter,
+        missing,
+        buildCounter(available)
+    );
 
 }
 
@@ -448,23 +437,17 @@ function buildCounter(list) {
 }
 
 
-function filterUniverse(predicate) {
+function formatList(indices, person, quantityThreshold = 2) {
 
-    return universe.filter(predicate);
-
-}
-
-
-function formatList(list, counter = null, quantityThreshold = 2) {
-
-    if (list.length === 0) {
+    if (indices.length === 0) {
         return "-";
     }
 
-    return list
-        .map(code => {
+    return indices
+        .map(index => {
 
-            const count = counter ? counter.get(code) : 0;
+            const code = album.getCode(index);
+            const count = person.getOfferByIndex(index);
 
             return count >= quantityThreshold
                 ? `${code}(${count})`
@@ -480,97 +463,21 @@ function formatList(list, counter = null, quantityThreshold = 2) {
 // Modelo
 // ======================================================
 
-function createTradeState(name, missingList, availableCounter) {
+function createAlbumState(name, missingList, availableCounter) {
 
-    const missing = new Set(missingList);
+    const person = new AlbumState(album, name);
 
-    const repeated = new Set();
+    // Láminas buscadas
+    for (const sticker of missingList) {
+        person.addMissing(sticker);
+    }
 
+    // Láminas ofrecidas
     for (const [sticker, count] of availableCounter) {
-
-        if (count >= 2) {
-
-            repeated.add(sticker);
-
-        }
-
+        person.addOffer(sticker, count);
     }
 
-    const offerable = new Set(
-        availableCounter.keys()
-    );
-
-    const owned = new Set(universe);
-
-    for (const sticker of missing) {
-
-        owned.delete(sticker);
-
-    }
-
-    const ownedWithoutRepeats = new Set(owned);
-
-    for (const sticker of repeated) {
-
-        ownedWithoutRepeats.delete(sticker);
-
-    }
-
-    return {
-
-        name,
-
-        missing,
-
-        available: availableCounter,
-
-        repeated,
-
-        offerable,
-
-        owned,
-
-        ownedWithoutRepeats
-
-    };
-
-}
-
-// ======================================================
-// Algoritmo
-// ======================================================
-
-function buildTradePlan(personA, personB) {
-
-    const directFromA = filterUniverse(code =>
-        personA.offerable.has(code) &&
-        personB.missing.has(code)
-    );
-
-    const directFromB = filterUniverse(code =>
-        personB.offerable.has(code) &&
-        personA.missing.has(code)
-    );
-
-    const repeatedAAgainstBUnique = filterUniverse(code =>
-        personA.repeated.has(code) &&
-        personB.ownedWithoutRepeats.has(code)
-    );
-
-    const repeatedBAgainstAUnique = filterUniverse(code =>
-        personB.repeated.has(code) &&
-        personA.ownedWithoutRepeats.has(code)
-    );
-
-    return {
-
-        directFromA,
-        directFromB,
-
-        repeatedAAgainstBUnique,
-        repeatedBAgainstAUnique
-
-    };
+    return person;
 
 }
 
@@ -697,7 +604,7 @@ async function calculate() {
 
         if (mode === "manual") {
 
-            personA = createTradeState(
+            personA = createAlbumState(
                 "A",
                 parseTokenList(aMissing.value),
                 buildCounter(
@@ -705,7 +612,7 @@ async function calculate() {
                 )
             );
 
-            personB = createTradeState(
+            personB = createAlbumState(
                 "B",
                 parseTokenList(bMissing.value),
                 buildCounter(
@@ -719,7 +626,7 @@ async function calculate() {
             const dataA = parseFiguritasExport(aFiguritas.value);
             const dataB = parseFiguritasExport(bFiguritas.value);
 
-            personA = createTradeState(
+            personA = createAlbumState(
                 "A",
                 parseTokenList(dataA.missingText),
                 buildCounter(
@@ -727,7 +634,7 @@ async function calculate() {
                 )
             );
 
-            personB = createTradeState(
+            personB = createAlbumState(
                 "B",
                 parseTokenList(dataB.missingText),
                 buildCounter(
@@ -751,7 +658,7 @@ async function calculate() {
 
         }
 
-        const plan = buildTradePlan(personA, personB);
+        const plan = TradePlanner.calculate(personA, personB);
 
         console.log(plan);
 
@@ -762,34 +669,34 @@ async function calculate() {
             `B puede cambiarle ${plan.directFromB.length} láminas a A`;
 
         titleAMatch.textContent =
-            `A necesita ${plan.repeatedBAgainstAUnique.length} repetidas dobles de B`;
+            `A necesita ${plan.doublesFromB.length} repetidas dobles de B`;
 
         titleBMatch.textContent =
-            `B necesita ${plan.repeatedAAgainstBUnique.length} repetidas dobles de A`;
+            `B necesita ${plan.doublesFromA.length} repetidas dobles de A`;
 
         resultADirect.textContent =
             formatList(
                 plan.directFromA,
-                personA.available
+                personA
             );
 
         resultBDirect.textContent =
             formatList(
                 plan.directFromB,
-                personB.available
+                personB
             );
 
         resultAMatch.textContent =
             formatList(
-                plan.repeatedBAgainstAUnique,
-                personB.available,
+                plan.doublesFromB,
+                personB,
                 3
             );
 
         resultBMatch.textContent =
             formatList(
-                plan.repeatedAAgainstBUnique,
-                personA.available,
+                plan.doublesFromA,
+                personA,
                 3
             );
 

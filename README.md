@@ -4,6 +4,10 @@ Aplicación web para calcular intercambios de láminas entre dos personas de for
 
 La aplicación se ejecuta completamente en el navegador, sin necesidad de servidor ni base de datos, y puede y se ejecuta mediante **GitHub Pages**.
 
+# Filosofía del proyecto
+
+Intercambio 2 plus nace con una idea sencilla: ayudar a que cada intercambio no solo complete un álbum hoy, sino que también aumente las posibilidades de futuros intercambios. Por eso, además de los cambios directos, la aplicación identifica repetidas dobles que pueden ser útiles para construir nuevas oportunidades de intercambio.
+
 ---
 
 ## Características
@@ -19,30 +23,6 @@ Ejemplos válidos:
 RSA3
 RSA3(2)
 ARG15(4), BRA8, USA12
-```
-
----
-
-## Tecnologías
-
-* HTML5
-* CSS3
-* JavaScript (ES6)
-* GitHub Pages
-
-No utiliza frameworks ni dependencias externas.
-
----
-
-## Estructura del proyecto
-
-```
-.
-├── index.html          # Interfaz
-├── style.css           # Estilos
-├── app.js              # Lógica de la aplicación
-├── mundial-2026.json   # Catálogo completo del álbum
-└── README.md
 ```
 
 ---
@@ -115,14 +95,16 @@ https://cpereiram.github.io/intercambio-2plus/
 
 ---
 
-## Origen del proyecto
-
-Este proyecto nace de la necesidad de poder calcular de manera rápida los intercambios de repetidas entre dos personas, comenzando primero como  una aplicación de escritorio desarrollada  en Python (Tkinter),  migrando posteriormente toda la lógica a una aplicación web estática para facilitar su uso desde cualquier dispositivo.
-
-El algoritmo de intercambio fue preservado durante la migración, adaptando únicamente la interfaz y la implementación al ecosistema JavaScript.
-
----
 
 ## Licencia
 
 MIT
+
+## Autor
+
+Cristóbal Pereira M.
+
+Proyecto desarrollado para facilitar el intercambio de láminas del Mundial 2026.
+
+GitHub:
+https://github.com/cpereiram
