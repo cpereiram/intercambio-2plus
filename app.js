@@ -550,7 +550,7 @@ async function copyResult(button) {
 
         await copyText(text);
 
-        button.textContent = "Â¡Copiado!";
+        button.textContent = "¡Copiado!";
 
         window.setTimeout(() => {
             button.textContent = "Copiar resultado";
