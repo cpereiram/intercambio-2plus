@@ -39,10 +39,14 @@ const bAvailable = document.getElementById("bAvailable");
 
 const personasSection = document.querySelector(".personas");
 const figuritasMode = document.getElementById("figuritasMode");
-const intercambialaminasMode = document.getElementById("intercambialaminasMode");
 
 const aIntercambialaminasId = document.getElementById("aIntercambialaminasId");
 const bIntercambialaminasId = document.getElementById("bIntercambialaminasId");
+const aImportButton =
+    document.getElementById("aImportButton");
+
+const bImportButton =
+    document.getElementById("bImportButton");
 
 const aFiguritas = document.getElementById("aFiguritas");
 const bFiguritas = document.getElementById("bFiguritas");
@@ -75,6 +79,11 @@ window.addEventListener("DOMContentLoaded", initialize);
 
 async function initialize() {
 
+    aImportButton.addEventListener("click", () => importPerson("A")
+    );
+
+    bImportButton.addEventListener("click", () => importPerson("B")
+    );
     calculateButton.addEventListener("click", calculate);
     inputModes.forEach(radio =>
         radio.addEventListener("change", updateInputMode)
@@ -385,32 +394,29 @@ function externalListToStickers(items) {
 
 }
 
-async function loadIntercambialaminasTradeState(value, letter) {
 
-    const userId = parseIntercambialaminasUserId(value);
-    const result = await fetchIntercambialaminasJson(
-        `/v2/users/${userId}/collections/${WORLD_CUP_2026_COLLECTION_ID}?include=publisher`
-    );
+async function loadIntercambialaminasLists(value) {
+
+    const userId =
+        parseIntercambialaminasUserId(value);
+
+    const result =
+        await fetchIntercambialaminasJson(
+            `/v2/users/${userId}/collections/${WORLD_CUP_2026_COLLECTION_ID}?include=publisher`
+        );
+
     const data = result.data;
 
-    if (!data?.info) {
-        throw new Error(`No se encontró el álbum Mundial 2026 para el usuario ${userId}.`);
-    }
+    const missing =
+        externalListToStickers(data.wishlist);
 
-    const missing = externalListToStickers(data.wishlist);
-    const available = externalListToStickers(data.tradelist);
+    const available =
+        externalListToStickers(data.tradelist);
 
-    if (missing.length === 0 && available.length === 0) {
-        throw new Error(
-            `No se pudieron leer listas públicas de intercambio para el usuario ${userId}.`
-        );
-    }
-
-    return createAlbumState(
-        letter,
+    return {
         missing,
-        buildCounter(available)
-    );
+        available
+    };
 
 }
 
@@ -458,6 +464,22 @@ function formatList(indices, person, quantityThreshold = 2) {
 
 }
 
+function formatStickerList(list) {
+
+    const counter =
+        buildCounter(list);
+
+    return [...counter.entries()]
+        .map(([code, count]) =>
+
+            count > 1
+                ? `${code}(${count})`
+                : code
+
+        )
+        .join(", ");
+
+}
 
 // ======================================================
 // Modelo
@@ -494,6 +516,52 @@ function getInputMode() {
 
 }
 
+async function importPerson(letter) {
+
+    try {
+
+        if (!album) {
+            throw new Error(
+                "El catálogo aún se está cargando. Inténtalo nuevamente en unos segundos."
+            );
+        }
+
+        const idInput =
+            letter === "A"
+                ? aIntercambialaminasId
+                : bIntercambialaminasId;
+
+        const missingBox =
+            letter === "A"
+                ? aMissing
+                : bMissing;
+
+        const availableBox =
+            letter === "A"
+                ? aAvailable
+                : bAvailable;
+
+        const data =
+            await loadIntercambialaminasLists(
+                idInput.value
+            );
+
+        missingBox.value =
+            formatStickerList(data.missing);
+
+        availableBox.value =
+            formatStickerList(data.available);
+
+    }
+
+    catch(error){
+
+        alert(error.message);
+
+    }
+
+}
+
 function updateInputMode() {
 
     const mode = getInputMode();
@@ -502,9 +570,6 @@ function updateInputMode() {
 
     figuritasMode.hidden =
         mode !== "figuritas";
-
-    intercambialaminasMode.hidden =
-        mode !== "intercambialaminas";
 
 }
 
@@ -641,20 +706,6 @@ async function calculate() {
                     parseTokenList(dataB.availableText)
                 )
             );
-
-        }
-        else if (mode === "intercambialaminas") {
-
-            [personA, personB] = await Promise.all([
-                loadIntercambialaminasTradeState(
-                    aIntercambialaminasId.value,
-                    "A"
-                ),
-                loadIntercambialaminasTradeState(
-                    bIntercambialaminasId.value,
-                    "B"
-                )
-            ]);
 
         }
 

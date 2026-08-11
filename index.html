@@ -27,7 +27,7 @@
                             name="inputMode"
                             value="manual"
                             checked>
-                        Intercambialaminas (Manual)
+                        Intercambialaminas
                     </label>
 
                     <label>
@@ -38,21 +38,30 @@
                         Figuritas App
                     </label>
 
-                    <label>
-                        <input
-                            type="radio"
-                            name="inputMode"
-                            value="intercambialaminas">
-                        Intercambialaminas (ID)
-                    </label>
-
                 </section>
 
                 <section class="personas">
 
                     <article class="persona">
 
-                        <h2>Persona A · Intercambialaminas (Manual)</h2>
+                        <h2>Persona A · Intercambialaminas</h2>
+
+                        <label for="aIntercambialaminasId">
+                            ID o enlace del perfil
+                        </label>
+
+                        <div class="import-row">
+                            <input
+                                id="aIntercambialaminasId"
+                                type="text"
+                                placeholder="14061">
+
+                            <button
+                                id="aImportButton"
+                                type="button">
+                                Importar
+                            </button>
+                        </div>
 
                         <label for="aMissing">
                             Láminas faltantes
@@ -76,7 +85,25 @@
 
                     <article class="persona">
 
-                        <h2>Persona B · Intercambialaminas (Manual)</h2>
+                        <h2>Persona B · Intercambialaminas</h2>
+                        
+                        <label for="bIntercambialaminasId">
+                            ID o enlace del perfil
+                        </label>
+
+                        <div class="import-row">
+                            <input
+                                id="bIntercambialaminasId"
+                                type="text"
+                                placeholder="14170">
+
+                            <button
+                                class="import-button"
+                                id="bImportButton"
+                                type="button">
+                                Importar
+                            </button>
+                        </div>
 
                         <label for="bMissing">
                             Láminas faltantes
@@ -132,43 +159,6 @@
                             id="bFiguritas"
                             spellcheck="false"
                             placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
-
-                    </article>
-
-                </section>
-
-                <section
-                    id="intercambialaminasMode"
-                    class="intercambialaminas-mode"
-                    hidden>
-
-                    <article class="persona">
-
-                        <h2>Persona A · Intercambialaminas (ID)</h2>
-
-                        <label for="aIntercambialaminasId">
-                            ID o enlace del perfil
-                        </label>
-
-                        <input
-                            id="aIntercambialaminasId"
-                            type="text"
-                            placeholder="14061 o https://intercambialaminas.com/user/14061">
-
-                    </article>
-
-                    <article class="persona">
-
-                        <h2>Persona B · Intercambialaminas (ID)</h2>
-
-                        <label for="bIntercambialaminasId">
-                            ID o enlace del perfil
-                        </label>
-
-                        <input
-                            id="bIntercambialaminasId"
-                            type="text"
-                            placeholder="14170 o https://intercambialaminas.com/user/14170">
 
                     </article>
 
