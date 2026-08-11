@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0] - 2026-08-11
+
+### Added
+
+- Enlaces compartibles para abrir y recalcular un intercambio entre dos colecciones.
+- Visualización del nombre del perfil al importar desde IntercambiaLáminas.
+- Conservación de los nombres de perfiles en los enlaces compartidos.
+
 ## [1.2.0] - 2026-08-11
 
 ### Added

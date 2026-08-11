@@ -203,6 +203,11 @@ label {
 
 }
 
+.imported-profile {
+    color: var(--text);
+    font-weight: 600;
+}
+
 textarea {
 
     width: 100%;
@@ -242,6 +247,10 @@ textarea:focus {
     display: flex;
 
     justify-content: center;
+
+    gap: 1rem;
+
+    flex-wrap: wrap;
 
     margin: 2rem 0;
 
