@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de colecciones · Mundial 2026</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Calculadora de colecciones</h1>
+        <p>Suma, resta y convierte listas para actualizar o compartir tu colección.</p>
+        <a class="page-link" href="index.html">Volver al match de personas</a>
+    </header>
+    <main>
+        <section class="calculator-intro">
+            <p>Ingresa los códigos separados por comas. Usa <code>ARG3(2)</code> para indicar cantidades.</p>
+        </section>
+        <section class="mode-selector calculator-mode-selector">
+            <label><input type="radio" name="calculatorBaseMode" value="intercambialaminas" checked> IntercambiaLáminas</label>
+            <label><input type="radio" name="calculatorBaseMode" value="figuritas"> Figuritas App</label>
+        </section>
+        <section class="calculator-collections">
+            <article class="persona">
+                <h2>Colección base</h2>
+                <div id="calculatorIntercambialaminasMode">
+                    <label for="calculatorIntercambialaminasId">ID o enlace de perfil de IntercambiaLáminas</label>
+                    <div class="import-row">
+                        <input id="calculatorIntercambialaminasId" type="text" placeholder="14061">
+                        <button id="calculatorImportButton" class="import-button" type="button">Importar</button>
+                    </div>
+                    <label for="calculatorBaseMissing">Láminas faltantes</label>
+                    <textarea id="calculatorBaseMissing" spellcheck="false" placeholder="ARG1, BRA5, RSA12"></textarea>
+                    <label for="calculatorBaseAvailable">Láminas repetidas / disponibles</label>
+                    <textarea id="calculatorBaseAvailable" spellcheck="false" placeholder="ARG3(2), RSA18, USA9"></textarea>
+                </div>
+                <div id="calculatorFiguritasMode" hidden>
+                    <label for="calculatorFiguritasInput">Exportación completa</label>
+                    <textarea id="calculatorFiguritasInput" spellcheck="false" placeholder="Figuritas App - Lista&#10;Me faltan&#10;FWC 🏆: 1, 2, 3&#10;RSA 🇿🇦: 14, 18&#10;&#10;Repetidas&#10;RSA 🇿🇦: 2, 4, 8(3)"></textarea>
+                </div>
+            </article>
+            <article class="persona">
+                <h2>Colección para aplicar</h2>
+                <p class="card-help">Usa esta colección como el segundo operando para sumar o restar.</p>
+                <label for="calculatorOperandMissing">Láminas faltantes</label>
+                <textarea id="calculatorOperandMissing" spellcheck="false" placeholder="ARG1, BRA5, RSA12"></textarea>
+                <label for="calculatorOperandAvailable">Láminas repetidas / disponibles</label>
+                <textarea id="calculatorOperandAvailable" spellcheck="false" placeholder="ARG3(2), RSA18, USA9"></textarea>
+            </article>
+        </section>
+        <section class="calculator-actions">
+            <button id="calculatorAddButton" type="button">Sumar colecciones</button>
+            <button id="calculatorSubtractButton" type="button" class="secondary-button">Restar a la base</button>
+            <button id="calculatorTranslateButton" type="button" class="secondary-button">Convertir a Figuritas App</button>
+        </section>
+        <section class="calculator-results">
+            <article class="resultado">
+                <h3 id="calculatorResultTitle">Resultado</h3>
+                <label for="calculatorResultMissing">Láminas faltantes</label>
+                <textarea id="calculatorResultMissing" spellcheck="false" readonly placeholder="El resultado aparecerá aquí"></textarea>
+                <label for="calculatorResultAvailable">Láminas repetidas / disponibles</label>
+                <textarea id="calculatorResultAvailable" spellcheck="false" readonly placeholder="El resultado aparecerá aquí"></textarea>
+                <button id="calculatorCopyResult" class="copy-result" type="button" disabled>Copiar resultado</button>
+            </article>
+            <article class="resultado">
+                <h3>Exportación Figuritas App</h3>
+                <p class="card-help">Conversión de la colección base, lista para compartir o pegar en Figuritas App.</p>
+                <textarea id="calculatorFiguritasResult" spellcheck="false" readonly placeholder="La conversión aparecerá aquí"></textarea>
+                <button id="calculatorCopyFiguritas" class="copy-result" type="button" disabled>Copiar exportación</button>
+            </article>
+        </section>
+    </main>
+    <footer class="footer"><div class="footer-content"><span><strong>Intercambio 2plus</strong></span><span>Versión <span id="version">1.0.0</span></span><span>© 2026 Cristóbal Pereira</span></div></footer>
+    <script type="module" src="calculator.js"></script>
+</body>
+</html>

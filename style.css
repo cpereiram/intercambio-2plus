@@ -58,6 +58,47 @@ header p {
     color: var(--muted);
 }
 
+.page-link {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: .55rem .9rem;
+}
+
+.page-link:hover { background: var(--card); }
+
+.calculator-collections,
+.calculator-results {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.calculator-intro,
+.card-help { color: var(--muted); }
+
+.calculator-intro { text-align: center; margin-top: 1.5rem; }
+.card-help { margin-bottom: 1rem; line-height: 1.45; }
+
+.calculator-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+}
+
+.secondary-button { background: var(--card-hover); }
+.secondary-button:hover { background: var(--border); }
+
+.calculator-results { margin-top: 0; }
+.calculator-results textarea { min-height: 110px; }
+#calculatorFiguritasResult { min-height: 285px; margin-top: 1rem; }
+
 /* ---------- Modo de entrada ---------- */
 
 .mode-selector {
@@ -357,6 +398,8 @@ pre {
 
     .personas,
     .figuritas-mode,
+    .calculator-collections,
+    .calculator-results,
     .intercambialaminas-mode {
 
         grid-template-columns: 1fr;
