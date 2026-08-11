@@ -1,11 +1,5 @@
 # Changelog
 
-## [1.3.0] - 2026-08-11
-
-### Added
-
-- Conversión de exportaciones de Figuritas App a listas de faltantes y repetidas compatibles con IntercambiaLáminas.
-
 ## [1.2.0] - 2026-08-11
 
 ### Added
@@ -13,6 +7,7 @@
 - Página independiente de calculadora para sumar y restar colecciones.
 - Importación de una colección base desde un perfil de IntercambiaLáminas.
 - Conversión de colecciones al formato de exportación de Figuritas App.
+- Conversión de exportaciones de Figuritas App a listas de faltantes y repetidas compatibles con IntercambiaLáminas.
 
 ## [1.1.0] - 2026-08-11
 
