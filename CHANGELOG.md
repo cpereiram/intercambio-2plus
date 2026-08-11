@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0] - 2026-08-11
+
+### Added
+
+- Importación de láminas faltantes y repetidas desde el ID o enlace de perfil de IntercambiaLáminas, sin salir del modo manual.
+- Avisos en los resultados cuando una persona no registra láminas faltantes o no tiene repetidas con cantidad 2 o más.
+- Uso de singular en los resultados cuando hay exactamente una lámina o repetida doble.
+
+### Fixed
+
+- Se corrige el botón de importación de la persona B, que impedía inicializar la aplicación.
+- Se evita importar antes de que el catálogo de láminas termine de cargar.
+
 ## [1.0.0] - 2026-07-28
 
 ### Added
