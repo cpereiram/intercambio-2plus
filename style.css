@@ -97,7 +97,13 @@ header p {
 
 .calculator-results { margin-top: 0; }
 .calculator-results textarea { min-height: 110px; }
-#calculatorFiguritasResult { min-height: 285px; margin-top: 1rem; }
+#calculatorFiguritasResult { min-height: 300px; margin-top: 1rem; }
+
+/* La exportación de Figuritas App contiene varias líneas y emojis. */
+.figuritas-mode textarea,
+#calculatorFiguritasInput {
+    min-height: 300px;
+}
 
 /* ---------- Modo de entrada ---------- */
 
