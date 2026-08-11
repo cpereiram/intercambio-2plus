@@ -18,7 +18,8 @@ const resultMissing = document.getElementById("calculatorResultMissing");
 const resultAvailable = document.getElementById("calculatorResultAvailable");
 const figuritasResult = document.getElementById("calculatorFiguritasResult");
 const resultTitle = document.getElementById("calculatorResultTitle");
-const copyResultButton = document.getElementById("calculatorCopyResult");
+const copyMissingButton = document.getElementById("calculatorCopyMissing");
+const copyAvailableButton = document.getElementById("calculatorCopyAvailable");
 const copyFiguritasButton = document.getElementById("calculatorCopyFiguritas");
 const translateButton = document.getElementById("calculatorTranslateButton");
 const baseModes = document.querySelectorAll("input[name=calculatorBaseMode]");
@@ -31,7 +32,8 @@ async function initialize() {
     document.getElementById("calculatorAddButton").addEventListener("click", () => operate(1, "Suma de colecciones"));
     document.getElementById("calculatorSubtractButton").addEventListener("click", () => operate(-1, "Resta de colecciones"));
     document.getElementById("calculatorTranslateButton").addEventListener("click", translateBase);
-    copyResultButton.addEventListener("click", copyCollection);
+    copyMissingButton.addEventListener("click", () => copyText(resultMissing.value, copyMissingButton, "Copiar faltantes"));
+    copyAvailableButton.addEventListener("click", () => copyText(resultAvailable.value, copyAvailableButton, "Copiar repetidas"));
     copyFiguritasButton.addEventListener("click", () => copyText(figuritasResult.value, copyFiguritasButton, "Copiar exportación"));
     baseModes.forEach(mode => mode.addEventListener("change", updateBaseMode));
     updateBaseMode();
@@ -138,7 +140,7 @@ function operate(multiplier, title) {
         resultMissing.value = formatCounter(applyCounter(base.missing, operand.missing, multiplier));
         resultAvailable.value = formatCounter(applyCounter(base.available, operand.available, multiplier));
         resultTitle.textContent = title;
-        copyResultButton.disabled = false;
+        updateIntercambialaminasCopyButtons();
     } catch (error) {
         alert(error.message);
     }
@@ -169,7 +171,7 @@ function translateBase() {
             resultMissing.value = formatCounter(base.missing);
             resultAvailable.value = formatCounter(base.available);
             resultTitle.textContent = "Lista para IntercambiaLáminas";
-            copyResultButton.disabled = false;
+            updateIntercambialaminasCopyButtons();
             return;
         }
         figuritasResult.value = [
@@ -240,8 +242,9 @@ function externalCode(item) {
     return null;
 }
 
-async function copyCollection() {
-    await copyText(`Me faltan\n${resultMissing.value}\n\nRepetidas\n${resultAvailable.value}`, copyResultButton, "Copiar resultado");
+function updateIntercambialaminasCopyButtons() {
+    copyMissingButton.disabled = !resultMissing.value.trim();
+    copyAvailableButton.disabled = !resultAvailable.value.trim();
 }
 
 async function copyText(text, button, originalLabel) {
