@@ -10,6 +10,11 @@
 import Album from "./model/album.js";
 import AlbumState from "./model/albumState.js";
 import TradePlanner from "./model/tradePlanner.js";
+import {
+    clearSharedTradeUrl,
+    createSharedTradeUrl,
+    readSharedTradeUrl
+} from "./shareLink.js";
 
 // ======================================================
 // Versión
@@ -24,6 +29,8 @@ document.getElementById("version").textContent =
 // ======================================================
 
 let album = null;
+let aProfileName = "";
+let bProfileName = "";
 const stickerTokenRegex = /^([A-Za-z0-9-]+)(?:\((\d+)\))?$/;
 
 
@@ -42,6 +49,8 @@ const figuritasMode = document.getElementById("figuritasMode");
 
 const aIntercambialaminasId = document.getElementById("aIntercambialaminasId");
 const bIntercambialaminasId = document.getElementById("bIntercambialaminasId");
+const aImportedProfile = document.getElementById("aImportedProfile");
+const bImportedProfile = document.getElementById("bImportedProfile");
 const aImportButton =
     document.getElementById("aImportButton");
 
@@ -51,8 +60,17 @@ const bImportButton =
 const aFiguritas = document.getElementById("aFiguritas");
 const bFiguritas = document.getElementById("bFiguritas");
 const inputModes = document.querySelectorAll("input[name=inputMode]");
+const shareInputs = [
+    aMissing,
+    aAvailable,
+    bMissing,
+    bAvailable,
+    aFiguritas,
+    bFiguritas
+];
 
 const calculateButton = document.getElementById("calculateButton");
+const shareButton = document.getElementById("shareButton");
 
 const resultADirect = document.getElementById("resultADirect");
 const resultBDirect = document.getElementById("resultBDirect");
@@ -85,8 +103,15 @@ async function initialize() {
     bImportButton.addEventListener("click", () => importPerson("B")
     );
     calculateButton.addEventListener("click", calculate);
+    shareButton.addEventListener("click", shareTrade);
     inputModes.forEach(radio =>
-        radio.addEventListener("change", updateInputMode)
+        radio.addEventListener("change", () => {
+            updateInputMode();
+            invalidateShare();
+        })
+    );
+    shareInputs.forEach(input =>
+        input.addEventListener("input", invalidateShare)
     );
     copyButtons.forEach(button =>
         button.addEventListener("click", () => copyResult(button))
@@ -97,6 +122,8 @@ async function initialize() {
     try {
 
         await loadCatalog();
+
+        loadSharedTrade();
 
         console.log(`Catálogo cargado (${album.size} láminas)`);
 
@@ -400,10 +427,12 @@ async function loadIntercambialaminasLists(value) {
     const userId =
         parseIntercambialaminasUserId(value);
 
-    const result =
-        await fetchIntercambialaminasJson(
+    const [result, profileResult] = await Promise.all([
+        fetchIntercambialaminasJson(
             `/v2/users/${userId}/collections/${WORLD_CUP_2026_COLLECTION_ID}?include=publisher`
-        );
+        ),
+        fetchIntercambialaminasJson(`/v2/users/${userId}`)
+    ]);
 
     const data = result.data;
 
@@ -415,8 +444,31 @@ async function loadIntercambialaminasLists(value) {
 
     return {
         missing,
-        available
+        available,
+        profileName: getProfileName(profileResult.data)
     };
+
+}
+
+function getProfileName(data) {
+
+    const profile =
+        data.user ?? data.profile ?? data.owner ?? data.user_profile ?? {};
+
+    const candidates = [
+        data.displayName,
+        data.display_name,
+        profile.name,
+        profile.full_name,
+        profile.display_name,
+        data.user_name,
+        data.username,
+        data.name
+    ];
+
+    return candidates.find(value =>
+        typeof value === "string" && value.trim()
+    )?.trim() || "";
 
 }
 
@@ -611,6 +663,17 @@ async function importPerson(letter) {
         availableBox.value =
             formatStickerList(data.available);
 
+        if (letter === "A") {
+            aProfileName = data.profileName;
+        }
+        else {
+            bProfileName = data.profileName;
+        }
+
+        updateImportedProfileLabels();
+
+        invalidateShare();
+
     }
 
     catch(error){
@@ -632,6 +695,49 @@ function updateInputMode() {
 
 }
 
+function loadSharedTrade() {
+
+    try {
+
+        const trade = readSharedTradeUrl();
+
+        if (!trade) {
+            return;
+        }
+
+        document.querySelector(
+            `input[name=inputMode][value=${trade.mode}]`
+        ).checked = true;
+
+        if (trade.mode === "figuritas") {
+            aFiguritas.value = trade.aFiguritas;
+            bFiguritas.value = trade.bFiguritas;
+        }
+        else {
+            aMissing.value = trade.aMissing;
+            aAvailable.value = trade.aAvailable;
+            bMissing.value = trade.bMissing;
+            bAvailable.value = trade.bAvailable;
+        }
+
+        updateInputMode();
+        aProfileName = trade.aProfileName;
+        bProfileName = trade.bProfileName;
+        updateImportedProfileLabels();
+        clearSharedTradeUrl();
+        calculate();
+
+    }
+    catch (error) {
+
+        clearSharedTradeUrl();
+        alert(error.message);
+        console.error(error);
+
+    }
+
+}
+
 function clearResults() {
 
     setResult(resultADirect, "-");
@@ -640,6 +746,7 @@ function clearResults() {
     setResult(resultBMatch, "-");
 
     updateCopyButtons();
+    shareButton.disabled = true;
 
 }
 
@@ -713,6 +820,64 @@ async function copyText(text) {
 
     if (!copied) {
         throw new Error("Clipboard API no disponible.");
+    }
+
+}
+
+function invalidateShare() {
+
+    shareButton.disabled = true;
+    shareButton.textContent = "Copiar enlace del intercambio";
+
+}
+
+function updateImportedProfileLabels() {
+
+    const profiles = [
+        [aImportedProfile, aProfileName],
+        [bImportedProfile, bProfileName]
+    ];
+
+    for (const [element, profileName] of profiles) {
+        element.hidden = !profileName;
+        element.textContent = profileName
+            ? ` - Perfil importado: ${profileName}`
+            : "";
+    }
+
+}
+
+async function shareTrade() {
+
+    try {
+
+        const mode = getInputMode();
+        const link = createSharedTradeUrl({
+            mode,
+            aMissing: aMissing.value,
+            aAvailable: aAvailable.value,
+            bMissing: bMissing.value,
+            bAvailable: bAvailable.value,
+            aFiguritas: aFiguritas.value,
+            bFiguritas: bFiguritas.value,
+            aProfileName,
+            bProfileName
+        });
+
+        await copyText(link);
+
+        shareButton.textContent = "¡Enlace copiado!";
+
+        window.setTimeout(() => {
+            shareButton.textContent = "Copiar enlace del intercambio";
+        }, 2000);
+
+    }
+    catch (error) {
+
+        alert("No fue posible copiar el enlace del intercambio.");
+        console.error(error);
+
     }
 
 }
@@ -817,6 +982,7 @@ async function calculate() {
         );
 
         updateCopyButtons();
+        shareButton.disabled = false;
 
     }
     catch (error) {

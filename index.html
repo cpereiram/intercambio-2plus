@@ -48,7 +48,7 @@
                         <h2>Persona A · Intercambialaminas</h2>
 
                         <label for="aIntercambialaminasId">
-                            ID o enlace del perfil
+                            ID o enlace del perfil<span id="aImportedProfile" class="imported-profile" hidden></span>
                         </label>
 
                         <div class="import-row">
@@ -89,7 +89,7 @@
                         <h2>Persona B · Intercambialaminas</h2>
                         
                         <label for="bIntercambialaminasId">
-                            ID o enlace del perfil
+                            ID o enlace del perfil<span id="bImportedProfile" class="imported-profile" hidden></span>
                         </label>
 
                         <div class="import-row">
@@ -169,6 +169,10 @@
 
             <button id="calculateButton">
                 Calcular intercambios
+            </button>
+
+            <button id="shareButton" type="button" class="secondary-button" disabled>
+                Copiar enlace del intercambio
             </button>
 
         </section>

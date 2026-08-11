@@ -14,6 +14,7 @@ const figuritasMode = document.getElementById("calculatorFiguritasMode");
 const operandMissing = document.getElementById("calculatorOperandMissing");
 const operandAvailable = document.getElementById("calculatorOperandAvailable");
 const profileId = document.getElementById("calculatorIntercambialaminasId");
+const importedProfile = document.getElementById("calculatorImportedProfile");
 const resultMissing = document.getElementById("calculatorResultMissing");
 const resultAvailable = document.getElementById("calculatorResultAvailable");
 const figuritasResult = document.getElementById("calculatorFiguritasResult");
@@ -196,14 +197,44 @@ async function importBase() {
     try {
         if (!album) throw new Error("El catálogo aún se está cargando. Inténtalo nuevamente en unos segundos.");
         const userId = parseUserId(profileId.value);
-        const response = await fetch(`${API}/v2/users/${userId}/collections/${COLLECTION_ID}?include=publisher`, { headers: { Accept: "application/json" } });
-        if (!response.ok) throw new Error(`IntercambiaLáminas no pudo obtener los datos (HTTP ${response.status}).`);
+        const [response, profileResponse] = await Promise.all([
+            fetch(`${API}/v2/users/${userId}/collections/${COLLECTION_ID}?include=publisher`, { headers: { Accept: "application/json" } }),
+            fetch(`${API}/v2/users/${userId}`, { headers: { Accept: "application/json" } })
+        ]);
+        if (!response.ok || !profileResponse.ok) {
+            throw new Error(`IntercambiaLáminas no pudo obtener los datos (HTTP ${response.status}).`);
+        }
         const data = (await response.json()).data;
+        const profile = (await profileResponse.json()).data;
         baseMissing.value = formatCounter(externalListToCounter(data.wishlist));
         baseAvailable.value = formatCounter(externalListToCounter(data.tradelist));
+        updateImportedProfile(getProfileName(profile));
     } catch (error) {
         alert(error.message);
     }
+}
+
+function getProfileName(data) {
+    const profile = data.user ?? data.profile ?? data.owner ?? data.user_profile ?? {};
+    const candidates = [
+        data.displayName,
+        data.display_name,
+        profile.name,
+        profile.full_name,
+        profile.display_name,
+        data.user_name,
+        data.username,
+        data.name
+    ];
+
+    return candidates.find(value =>
+        typeof value === "string" && value.trim()
+    )?.trim() || "";
+}
+
+function updateImportedProfile(name) {
+    importedProfile.hidden = !name;
+    importedProfile.textContent = name ? ` - Perfil importado: ${name}` : "";
 }
 
 function externalListToCounter(items) {
