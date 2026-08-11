@@ -464,6 +464,65 @@ function formatList(indices, person, quantityThreshold = 2) {
 
 }
 
+function hasMissingStickers(person) {
+
+    for (const entry of person.entries()) {
+        if (entry.missing > 0) {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+function hasDoubleOffers(person) {
+
+    for (const entry of person.entries()) {
+        if (entry.offer >= 2) {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
+function setResult(result, text, copyable = false) {
+
+    result.textContent = text;
+    result.dataset.copyable = String(copyable);
+
+}
+
+function formatDirectResult(indices, donor, recipient) {
+
+    if (!hasMissingStickers(recipient)) {
+        return `${recipient.name} no tiene láminas faltantes. ` +
+            "Si ya completó el álbum, sus repetidas aún pueden ayudar a la otra persona.";
+    }
+
+    return formatList(indices, donor);
+
+}
+
+function formatDoubleResult(indices, donor) {
+
+    if (!hasDoubleOffers(donor)) {
+        return `${donor.name} no tiene repetidas con cantidad 2 o más. ` +
+            "Agrega la frecuencia, por ejemplo ARG3(2), para buscar este tipo de match.";
+    }
+
+    return formatList(indices, donor, 3);
+
+}
+
+function pluralize(quantity, singular, plural) {
+
+    return quantity === 1 ? singular : plural;
+
+}
+
 function formatStickerList(list) {
 
     const counter =
@@ -575,10 +634,10 @@ function updateInputMode() {
 
 function clearResults() {
 
-    resultADirect.textContent = "-";
-    resultBDirect.textContent = "-";
-    resultAMatch.textContent = "-";
-    resultBMatch.textContent = "-";
+    setResult(resultADirect, "-");
+    setResult(resultBDirect, "-");
+    setResult(resultAMatch, "-");
+    setResult(resultBMatch, "-");
 
     updateCopyButtons();
 
@@ -592,7 +651,7 @@ function updateCopyButtons() {
             button.dataset.resultId
         );
 
-        button.disabled = result.textContent.trim() === "-";
+        button.disabled = result.dataset.copyable !== "true";
         button.textContent = "Copiar resultado";
 
     });
@@ -714,42 +773,48 @@ async function calculate() {
         console.log(plan);
 
         titleADirect.textContent =
-            `A puede cambiarle ${plan.directFromA.length} láminas a B`;
+            `A puede cambiarle ${plan.directFromA.length} ${
+                pluralize(plan.directFromA.length, "lámina", "láminas")
+            } a B`;
 
         titleBDirect.textContent =
-            `B puede cambiarle ${plan.directFromB.length} láminas a A`;
+            `B puede cambiarle ${plan.directFromB.length} ${
+                pluralize(plan.directFromB.length, "lámina", "láminas")
+            } a A`;
 
         titleAMatch.textContent =
-            `A necesita ${plan.doublesFromB.length} repetidas dobles de B`;
+            `A necesita ${plan.doublesFromB.length} ${
+                pluralize(plan.doublesFromB.length, "repetida doble", "repetidas dobles")
+            } de B`;
 
         titleBMatch.textContent =
-            `B necesita ${plan.doublesFromA.length} repetidas dobles de A`;
+            `B necesita ${plan.doublesFromA.length} ${
+                pluralize(plan.doublesFromA.length, "repetida doble", "repetidas dobles")
+            } de A`;
 
-        resultADirect.textContent =
-            formatList(
-                plan.directFromA,
-                personA
-            );
+        setResult(
+            resultADirect,
+            formatDirectResult(plan.directFromA, personA, personB),
+            plan.directFromA.length > 0
+        );
 
-        resultBDirect.textContent =
-            formatList(
-                plan.directFromB,
-                personB
-            );
+        setResult(
+            resultBDirect,
+            formatDirectResult(plan.directFromB, personB, personA),
+            plan.directFromB.length > 0
+        );
 
-        resultAMatch.textContent =
-            formatList(
-                plan.doublesFromB,
-                personB,
-                3
-            );
+        setResult(
+            resultAMatch,
+            formatDoubleResult(plan.doublesFromB, personB),
+            plan.doublesFromB.length > 0
+        );
 
-        resultBMatch.textContent =
-            formatList(
-                plan.doublesFromA,
-                personA,
-                3
-            );
+        setResult(
+            resultBMatch,
+            formatDoubleResult(plan.doublesFromA, personA),
+            plan.doublesFromA.length > 0
+        );
 
         updateCopyButtons();
 
