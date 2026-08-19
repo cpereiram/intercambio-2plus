@@ -311,13 +311,21 @@ function parseFiguritasExport(text) {
 
 function parseIntercambialaminasUserId(value) {
 
-    const match = value.trim().match(/(?:\/user\/)?(\d+)(?:\/?(?:\?.*)?)?$/i);
+    const userId = readIntercambialaminasUserId(value);
 
-    if (!match) {
+    if (!userId) {
         throw new Error("Ingresa un ID de usuario válido o el enlace de su perfil.");
     }
 
-    return match[1];
+    return userId;
+
+}
+
+function readIntercambialaminasUserId(value) {
+
+    const match = value.trim().match(/(?:\/user\/)?(\d+)(?:\/?(?:\?.*)?)?$/i);
+
+    return match ? match[1] : "";
 
 }
 
@@ -699,7 +707,7 @@ function loadSharedTrade() {
 
     try {
 
-        const trade = readSharedTradeUrl();
+        const trade = readSharedTradeUrl(album);
 
         if (!trade) {
             return;
@@ -714,10 +722,12 @@ function loadSharedTrade() {
             bFiguritas.value = trade.bFiguritas;
         }
         else {
-            aMissing.value = trade.aMissing;
-            aAvailable.value = trade.aAvailable;
-            bMissing.value = trade.bMissing;
-            bAvailable.value = trade.bAvailable;
+            aIntercambialaminasId.value = trade.aProfileId || "";
+            bIntercambialaminasId.value = trade.bProfileId || "";
+            aMissing.value = sharedListToText(trade.aMissing);
+            aAvailable.value = sharedListToText(trade.aAvailable);
+            bMissing.value = sharedListToText(trade.bMissing);
+            bAvailable.value = sharedListToText(trade.bAvailable);
         }
 
         updateInputMode();
@@ -735,6 +745,14 @@ function loadSharedTrade() {
         console.error(error);
 
     }
+
+}
+
+function sharedListToText(list) {
+
+    return Array.isArray(list)
+        ? formatStickerList(list)
+        : list;
 
 }
 
@@ -852,17 +870,45 @@ async function shareTrade() {
     try {
 
         const mode = getInputMode();
+        let collectionA;
+        let collectionB;
+
+        if (mode === "figuritas") {
+            const dataA = parseFiguritasExport(aFiguritas.value);
+            const dataB = parseFiguritasExport(bFiguritas.value);
+
+            collectionA = {
+                missing: parseTokenList(dataA.missingText),
+                available: parseTokenList(dataA.availableText)
+            };
+            collectionB = {
+                missing: parseTokenList(dataB.missingText),
+                available: parseTokenList(dataB.availableText)
+            };
+        }
+        else {
+            collectionA = {
+                missing: parseTokenList(aMissing.value),
+                available: parseTokenList(aAvailable.value)
+            };
+            collectionB = {
+                missing: parseTokenList(bMissing.value),
+                available: parseTokenList(bAvailable.value)
+            };
+        }
+
         const link = createSharedTradeUrl({
-            mode,
-            aMissing: aMissing.value,
-            aAvailable: aAvailable.value,
-            bMissing: bMissing.value,
-            bAvailable: bAvailable.value,
-            aFiguritas: aFiguritas.value,
-            bFiguritas: bFiguritas.value,
-            aProfileName,
-            bProfileName
-        });
+            aMissing: collectionA.missing,
+            aAvailable: collectionA.available,
+            bMissing: collectionB.missing,
+            bAvailable: collectionB.available,
+            aProfileId: readIntercambialaminasUserId(
+                aIntercambialaminasId.value
+            ),
+            bProfileId: readIntercambialaminasUserId(
+                bIntercambialaminasId.value
+            )
+        }, album);
 
         await copyText(link);
 

@@ -1,12 +1,22 @@
 # Changelog
 
+## [1.3.1] - 2026-08-19
+
+### Changed
+
+- Se optimiza el formato de enlaces compartidos para usar un hash más corto y legible.
+- Los IDs de perfil se guardan al inicio del enlace para restaurar usuarios rápidamente.
+- Las listas se serializan con un esquema compacto por grupo y cantidad.
+- Se mantiene compatibilidad con los formatos previos para no romper enlaces ya compartidos.
+
 ## [1.3.0] - 2026-08-11
 
 ### Added
 
 - Enlaces compartibles para abrir y recalcular un intercambio entre dos colecciones.
 - Visualización del nombre del perfil al importar desde IntercambiaLáminas.
-- Conservación de los nombres de perfiles en los enlaces compartidos.
+- Restauración automática de las listas al abrir un enlace compartido.
+- Codificación compacta de las listas en los enlaces compartidos.
 
 ## [1.2.0] - 2026-08-11
 
