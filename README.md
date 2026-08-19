@@ -1,25 +1,28 @@
 # Intercambio (2 plus) de Láminas Mundial 2026
 
-Aplicación web para calcular intercambios de láminas entre dos personas de forma rápida, utilizando únicamente HTML, CSS y JavaScript.
+Aplicación web para calcular intercambios de láminas entre dos personas de forma rápida, utilizando HTML, CSS y JavaScript puro.
 
-La aplicación se ejecuta completamente en el navegador, sin necesidad de servidor ni base de datos, y puede y se ejecuta mediante **GitHub Pages**.
+La aplicación funciona 100% en el navegador, sin servidor ni base de datos, y está publicada con **GitHub Pages**.
 
 # Filosofía del proyecto
 
-Intercambio 2 plus nace con una idea sencilla: ayudar a que cada intercambio no solo complete un álbum hoy, sino que también aumente las posibilidades de futuros intercambios. Por eso, además de los cambios directos, la aplicación identifica repetidas dobles que pueden ser útiles para construir nuevas oportunidades de intercambio.
+Intercambio 2 plus nace para ayudar a que cada intercambio no solo complete un álbum hoy, sino que también genere mejores oportunidades para futuros trueques. Además de calcular cambios directos, la app detecta repetidas útiles para la otra persona y ayuda a priorizar intercambios más valiosos.
 
 ---
 
 ## Características
 
 * Cálculo de intercambios directos entre dos personas.
-* Identificación de láminas repetidas útiles para la otra persona.
+* Detección de láminas repetidas útiles para la otra persona.
 * Validación automática de códigos contra el catálogo oficial.
-* Soporte para cantidades mediante el formato `CODIGO(n)`.
+* Importación desde perfiles de IntercambiaLáminas.
+* Importación desde exportaciones de Figuritas App.
+* Compartido de enlaces compactados con IDs de perfil y instantáneas de las colecciones.
+* Compatibilidad con versiones previas de enlaces compartidos.
 
-Ejemplos válidos:
+Ejemplos válidos de entrada:
 
-```
+```text
 RSA3
 RSA3(2)
 ARG15(4), BRA8, USA12
@@ -36,10 +39,42 @@ Para cada persona se ingresan:
 
 La aplicación calcula:
 
-* Láminas que A puede ofrecer a B, y viceversa.
-* Láminas repetidas (dos o más copias) que podrían ser útiles para la otra persona.
+* Láminas que A puede ofrecer a B y viceversa.
+* Láminas repetidas (dos o más copias) que pueden ser útiles para la otra persona.
+* Resultados optimizados para priorizar intercambios concretos y útiles.
 
 Todo el procesamiento ocurre localmente en el navegador.
+
+---
+
+## Enlaces compartidos
+
+La versión actual incluye un formato compacto de enlace para enviar un intercambio exacto a otra persona o guardar una instantánea del cálculo.
+
+Formato general:
+
+```text
+#share=3&p={ID1}.{ID2}%a&{buscaA}&{repA}%b&{buscaB}&{repB}
+```
+
+Donde:
+
+* `p` son los IDs de perfil de IntercambiaLáminas.
+* `%a` y `%b` representan las listas de A y B.
+* `busca` y `rep` representan faltantes y repetidas respectivamente.
+* El contenido se comprime por grupo y cantidad para ahorrar caracteres.
+
+Ejemplo:
+
+```text
+#share=3&p=14061.14170%a&01.A2B3C3|04.ABC&01C%b&01.ABC2&01D
+```
+
+Este formato permite:
+
+* recuperar los perfiles importados
+* guardar una instantánea del intercambio calculado
+* compartir mucho menos texto que una versión expandida
 
 ---
 
@@ -67,7 +102,7 @@ python -m http.server
 
 Luego abrir:
 
-```
+```text
 http://localhost:8000
 ```
 
@@ -81,6 +116,17 @@ El proyecto está publicado en línea mediante GitHub Pages.
 
 https://cpereiram.github.io/intercambio-2plus/
 
+---
+
+## Versionado
+
+La versión actual es **1.3.1**.
+
+Se sigue la convención SemVer:
+
+```text
+MAJOR.MINOR.PATCH
+```
 
 ---
 
@@ -88,13 +134,12 @@ https://cpereiram.github.io/intercambio-2plus/
 
 * Guardado automático mediante LocalStorage.
 * Cálculo automático mientras se escribe.
-* Importación y exportación de listas.
-* Estadísticas del álbum.
+* Exportación de colecciones a formatos útiles.
+* Estadísticas del álbum y progreso general.
 * Comparación entre más de dos personas.
 * Soporte para nuevos álbumes mediante JSON.
 
 ---
-
 
 ## Licencia
 
